@@ -1,53 +1,70 @@
 <?php
 
 /** @var yii\web\View $this */
+/** @var yii\elasticsearch\ActiveDataProvider $dataProvider */
+/** @var \yii\base\Model $searchModel */
+/** @var bool $isConnected */
+
+use app\models\Document;
+use yii\bootstrap\Html;
+use yii\grid\GridView;
+use yii\helpers\Url;
 
 $this->title = 'My Yii Application';
 ?>
 <div class="site-index">
 
-    <div class="jumbotron text-center bg-transparent">
-        <h1 class="display-4">Congratulations!</h1>
-
-        <p class="lead">You have successfully created your Yii-powered application.</p>
-
-        <p><a class="btn btn-lg btn-success" href="http://www.yiiframework.com">Get started with Yii</a></p>
+    <div class="row">
+        <div class="col-sm-3">
+            <?= Html::a('Индексация', ['indexing'], ['class' => 'btn btn-success ' . (!$isConnected ? 'disabled' : '')]) ?>
+        </div>
+        <div class="col-sm-3 col-sm-offset-3">
+            <?= !$isConnected
+                ? Html::a('Подключить API Яндекс', ['connect-api'], ['class' => 'btn btn-success pull-right'])
+                : Html::a('Отключить API', ['disconnect-api'], ['class' => 'btn btn-danger pull-right'])
+            ?>
+        </div>
+        <div class="col-sm-3">
+            <?= Html::a('Пересоздать индекс', ['recreate-index'], ['class' => 'btn btn-danger pull-right']) ?>
+        </div>
     </div>
 
-    <div class="body-content">
-
+    <?php if (Yii::$app->session->hasFlash('indexingIsOk')): ?>
         <div class="row">
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-outline-secondary" href="http://www.yiiframework.com/doc/">Yii Documentation &raquo;</a></p>
-            </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-outline-secondary" href="http://www.yiiframework.com/forum/">Yii Forum &raquo;</a></p>
-            </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-outline-secondary" href="http://www.yiiframework.com/extensions/">Yii Extensions &raquo;</a></p>
+            <div class="alert alert-success">
+                Индексация прошла успешно!
             </div>
         </div>
+    <?php endif; ?>
 
-    </div>
+    <p>
+        <?php echo $this->render('_search', ['model' => $searchModel]); ?>
+    </p>
+
+    <?= GridView::widget([
+        'dataProvider' => $dataProvider,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+            [
+                'attribute' => 'name',
+                'format' => 'raw',
+                'value' => function(Document $model) {
+                    return Html::a($model->name, Url::toRoute(['view', 'id' => $model->_id]));
+                },
+            ],
+            'created',
+            'mime_type',
+            'media_type',
+            [
+                'attribute' => 'file',
+                'format' => 'raw',
+                'value' => function(Document $model) use ($isConnected) {
+                    return Html::a('Скачать', Url::to(['download', 'path' => $model->path, 'name' => $model->name]), [
+                        'target' => '_blank',
+                        'class' => 'btn btn-info ' . (!$isConnected ? 'disabled' : ''),
+                    ]);
+                },
+            ],
+        ],
+    ]); ?>
 </div>

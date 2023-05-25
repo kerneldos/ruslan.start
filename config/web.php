@@ -51,6 +51,9 @@ $config = [
                 'action' => yii\web\UrlNormalizer::ACTION_REDIRECT_TEMPORARY, // используем временный редирект вместо постоянного
             ],
             'rules' => [
+                '' => 'site/index',
+                'document/<id>' => 'site/view',
+                '<_a:login|logout>' => 'site/<_a>',
             ],
         ],
         'elasticsearch' => [
@@ -77,6 +80,11 @@ if (YII_ENV_DEV) {
         'class' => 'yii\debug\Module',
         // uncomment the following to add your IP if you are not connecting from localhost.
         //'allowedIPs' => ['127.0.0.1', '::1'],
+        'panels' => [
+            'elasticsearch' => [
+                'class' => 'yii\\elasticsearch\\DebugPanel',
+            ],
+        ],
     ];
 
     $config['bootstrap'][] = 'gii';

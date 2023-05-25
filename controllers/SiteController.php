@@ -2,9 +2,18 @@
 
 namespace app\controllers;
 
+use app\helpers\FileConverter;
+use app\models\Config;
+use app\models\Document;
+use app\models\DocumentSearch;
+use yii\base\InvalidConfigException;
+use yii\httpclient\Client;
 use Yii;
 use yii\filters\AccessControl;
+use yii\httpclient\Exception;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
+use yii\web\RangeNotSatisfiableHttpException;
 use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
@@ -15,8 +24,7 @@ class SiteController extends Controller
     /**
      * {@inheritdoc}
      */
-    public function behaviors()
-    {
+    public function behaviors(): array {
         return [
             'access' => [
                 'class' => AccessControl::class,
@@ -41,8 +49,7 @@ class SiteController extends Controller
     /**
      * {@inheritdoc}
      */
-    public function actions()
-    {
+    public function actions(): array {
         return [
             'error' => [
                 'class' => 'yii\web\ErrorAction',
@@ -59,9 +66,15 @@ class SiteController extends Controller
      *
      * @return string
      */
-    public function actionIndex()
-    {
-        return $this->render('index');
+    public function actionIndex(): string {
+        $searchModel = new DocumentSearch();
+        $dataProvider = $searchModel->search($this->request->queryParams);
+
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'isConnected' => !empty(Yii::$app->session['yandex_api_token']),
+        ]);
     }
 
     /**
@@ -91,8 +104,7 @@ class SiteController extends Controller
      *
      * @return Response
      */
-    public function actionLogout()
-    {
+    public function actionLogout(): Response {
         Yii::$app->user->logout();
 
         return $this->goHome();
@@ -121,8 +133,213 @@ class SiteController extends Controller
      *
      * @return string
      */
-    public function actionAbout()
-    {
+    public function actionAbout(): string {
         return $this->render('about');
+    }
+
+    /**
+     * @return Response
+     * @throws Exception
+     * @throws InvalidConfigException
+     */
+    public function actionIndexing(): Response {
+        $client = new Client(['baseUrl' => 'https://cloud-api.yandex.net/v1/']);
+        $response = $client->createRequest()
+            ->addHeaders(['Authorization' => Yii::$app->session['yandex_api_token']['access_token']])
+            ->setMethod('GET')
+            ->setUrl('disk/resources/files')
+            ->send();
+
+        if ($response->isOk) {
+            foreach ($response->data['items'] as $file) {
+                if (empty(Document::findOne(['path' => $file['path']]))) {
+                    $downloadUrlResponse = $client->createRequest()
+                        ->addHeaders(['Authorization' => Yii::$app->session['yandex_api_token']['access_token']])
+                        ->setUrl('disk/resources/download')
+                        ->setMethod('GET')
+                        ->setData(['path' => $file['path']])
+                        ->send();
+
+                    $content = $file['name'];
+                    if ($downloadUrlResponse->isOk) {
+                        if (in_array($file['mime_type'], FileConverter::AVAILABLE_MIME_TYPES)) {
+                            $fileName = Yii::getAlias('@runtime/tempFile.data');
+                            $fileData = file_get_contents($downloadUrlResponse->data['href']);
+                            file_put_contents($fileName, $fileData);
+
+                            $converter = new FileConverter($fileName);
+                            $content  .=  ' ' . $converter->convert($file['mime_type']);
+                            @unlink($fileName);
+                        }
+                    }
+
+                    $document = new Document([
+                        'name'       => $file['name'],
+                        'content'    => $content,
+                        'created'    => $file['created'],
+                        'mime_type'  => $file['mime_type'],
+                        'media_type' => $file['media_type'],
+                        'path'       => $file['path'],
+                        'sha256'     => $file['sha256'],
+                        'md5'        => $file['md5'],
+                    ]);
+                    $document->save();
+                }
+            }
+        }
+
+        Yii::$app->session->setFlash('indexingIsOk');
+        return $this->redirect('index');
+    }
+
+    /**
+     * @param string $code
+     *
+     * @return Response
+     * @throws Exception
+     * @throws InvalidConfigException
+     */
+    public function actionGetToken(string $code): Response {
+        $clientId = Config::findOne(['name' => 'yandex_client_id']);
+        $clientSecret = Config::findOne(['name' => 'yandex_client_secret']);
+
+        $client = new Client();
+        $response = $client->createRequest()
+            ->setMethod('POST')
+            ->setUrl('https://oauth.yandex.ru/token')
+            ->setData([
+                'grant_type' => 'authorization_code',
+                'code' => $code,
+                'client_id' => $clientId->value,
+                'client_secret' => $clientSecret->value,
+            ])
+            ->send();
+        if ($response->isOk) {
+            Yii::$app->session->set('yandex_api_token', array_merge($response->data, ['token_created' => time()]));
+        }
+
+        return $this->redirect('index');
+    }
+
+    /**
+     * @param string $path
+     * @param string $name
+     *
+     * @return Response
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws RangeNotSatisfiableHttpException
+     */
+    public function actionDownload(string $path, string $name): Response {
+        $client = new Client(['baseUrl' => 'https://cloud-api.yandex.net/v1/']);
+        $response = $client->createRequest()
+            ->addHeaders(['Authorization' => Yii::$app->session['yandex_api_token']['access_token']])
+            ->setUrl('disk/resources/download')
+            ->setMethod('GET')
+            ->setData(['path' => $path])
+            ->send();
+
+        if ($response->isOk) {
+            return Yii::$app->response->sendContentAsFile(file_get_contents($response->data['href']), $name);
+        }
+
+        return $this->redirect('index');
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isTokenExpired(): bool {
+        if (empty(Yii::$app->session['yandex_api_token'])) {
+            return true;
+        }
+
+        $token = Yii::$app->session['yandex_api_token'];
+        if (time() > $token['token_created'] + $token['expires_in']) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $redirectUri
+     *
+     * @return string
+     * @throws NotFoundHttpException
+     */
+    protected function getAuthUrl(string $redirectUri): string {
+        $clientId = Config::findOne(['name' => 'yandex_client_id']);
+        $clientSecret = Config::findOne(['name' => 'yandex_client_secret']);
+
+        if (!empty($clientId->value) && !empty($clientSecret->value)) {
+            return sprintf('https://oauth.yandex.ru/authorize?%s', http_build_query([
+                'response_type' => 'code',
+                'client_id' => $clientId->value,
+                'redirect_uri' => $redirectUri,
+                'state' => 'yandex',
+                'force_confirm' => true,
+            ], '', '&', PHP_QUERY_RFC3986));
+        }
+
+        throw new NotFoundHttpException('Client Id or Client Secret is empty');
+    }
+
+    /**
+     * @return Response
+     * @throws NotFoundHttpException
+     */
+    public function actionConnectApi(): Response {
+        $authUrl = $this->getAuthUrl('https://6154-195-88-112-58.ngrok-free.app/site/get-token');
+
+        return $this->redirect($authUrl);
+    }
+
+    /**
+     * @return Response
+     */
+    public function actionDisconnectApi(): Response {
+        Yii::$app->session->remove('yandex_api_token');
+
+        return $this->goBack();
+    }
+
+    /**
+     * Displays a single Document model.
+     * @param string $id ID
+     * @return string
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionView(string $id): string {
+        return $this->render('view', [
+            'model' => $this->findModel($id),
+            'isConnected' => !empty(Yii::$app->session['yandex_api_token']),
+        ]);
+    }
+
+    /**
+     * @return Response
+     * @throws InvalidConfigException
+     * @throws \yii\elasticsearch\Exception
+     */
+    public function actionRecreateIndex(): Response {
+        Document::deleteIndex();
+        Document::createIndex();
+
+        return $this->redirect('index');
+    }
+
+    /**
+     * @param string $id
+     *
+     * @return Document|null
+     * @throws NotFoundHttpException
+     */
+    protected function findModel(string $id): ?Document {
+        if (($model = Document::findOne(['_id' => $id])) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
     }
 }
