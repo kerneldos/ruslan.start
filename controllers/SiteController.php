@@ -160,7 +160,7 @@ class SiteController extends Controller
                         ->setData(['path' => $file['path']])
                         ->send();
 
-                    $content = $file['name'];
+                    $content = '';
                     if ($downloadUrlResponse->isOk) {
                         if (in_array($file['mime_type'], FileConverter::AVAILABLE_MIME_TYPES)) {
                             $fileName = Yii::getAlias('@runtime/tempFile.data');
@@ -168,7 +168,7 @@ class SiteController extends Controller
                             file_put_contents($fileName, $fileData);
 
                             $converter = new FileConverter($fileName);
-                            $content  .=  ' ' . $converter->convert($file['mime_type']);
+                            $content   = $converter->convert($file['mime_type']);
                             @unlink($fileName);
                         }
                     }
@@ -184,6 +184,33 @@ class SiteController extends Controller
                         'md5'        => $file['md5'],
                     ]);
                     $document->save();
+                } else {
+                    $document = Document::findOne(['path' => $file['path']]);
+
+                    if ($document->md5 !== $file['md5']) {
+                        $downloadUrlResponse = $client->createRequest()
+                            ->addHeaders(['Authorization' => Yii::$app->session['yandex_api_token']['access_token']])
+                            ->setUrl('disk/resources/download')
+                            ->setMethod('GET')
+                            ->setData(['path' => $file['path']])
+                            ->send();
+
+                        $content = '';
+                        if ($downloadUrlResponse->isOk) {
+                            if (in_array($file['mime_type'], FileConverter::AVAILABLE_MIME_TYPES)) {
+                                $fileName = Yii::getAlias('@runtime/tempFile.data');
+                                $fileData = file_get_contents($downloadUrlResponse->data['href']);
+                                file_put_contents($fileName, $fileData);
+
+                                $converter = new FileConverter($fileName);
+                                $content   = $converter->convert($file['mime_type']);
+                                @unlink($fileName);
+                            }
+                        }
+
+                        $document->content = $content;
+                        $document->save();
+                    }
                 }
             }
         }
