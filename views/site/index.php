@@ -24,7 +24,7 @@ $this->title = 'My Yii Application';
                 : Html::a('Отключить API', ['disconnect-api'], ['class' => 'btn btn-danger pull-right'])
             ?>
         </div>
-        <?php if (!Yii::$app->user->isGuest()): ?>
+        <?php if (!Yii::$app->user->isGuest): ?>
             <div class="col-sm-3">
                 <?= Html::a('Пересоздать индекс', ['recreate-index'], ['class' => 'btn btn-danger pull-right']) ?>
             </div>
