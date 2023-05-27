@@ -94,6 +94,8 @@ class IndexingJob extends BaseObject implements JobInterface {
                     }
                 }
             }
+        } else {
+            Yii::debug($response->data);
         }
     }
 }
