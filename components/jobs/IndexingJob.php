@@ -43,15 +43,13 @@ class IndexingJob extends BaseObject implements JobInterface {
 
                     $content = '';
                     if ($downloadUrlResponse->isOk) {
-                        if (in_array($file['mime_type'], FileConverter::AVAILABLE_MIME_TYPES)) {
-                            $fileName = Yii::getAlias('@runtime/tempFile.data');
-                            $fileData = file_get_contents($downloadUrlResponse->data['href']);
-                            file_put_contents($fileName, $fileData);
+                        $fileName = Yii::getAlias('@runtime/tempFile.data');
+                        $fileData = file_get_contents($downloadUrlResponse->data['href']);
+                        file_put_contents($fileName, $fileData);
 
-                            $converter = new FileConverter($fileName);
-                            $content   = $converter->convert($file['mime_type']);
-                            @unlink($fileName);
-                        }
+                        $converter = new FileConverter($fileName);
+                        $content   = $converter->convert($file['mime_type']);
+                        @unlink($fileName);
                     }
 
                     $document = new Document([
