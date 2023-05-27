@@ -171,6 +171,17 @@ class SiteController extends Controller
             ])
             ->send();
         if ($response->isOk) {
+            $configToken = Config::findOne(['name' => 'yandex_api_token']);
+            if (empty($configToken)) {
+                $configToken = new Config([
+                    'title' => 'Yandex API Token',
+                    'name'  => 'yandex_api_token',
+                ]);
+            }
+
+            $configToken->value = $response->data['access_token'];
+            $configToken->save();
+
             Yii::$app->session->set('yandex_api_token', array_merge($response->data, ['token_created' => time()]));
         }
 

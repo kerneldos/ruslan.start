@@ -3,6 +3,7 @@
 namespace app\components\jobs;
 
 use app\helpers\FileConverter;
+use app\models\Config;
 use app\models\Document;
 use Yii;
 use yii\base\BaseObject;
@@ -21,9 +22,11 @@ class IndexingJob extends BaseObject implements JobInterface {
      * @throws Exception
      */
     public function execute($queue) {
+        $configToken = Config::findOne(['name' => 'yandex_api_token']);
+
         $client = new Client(['baseUrl' => 'https://cloud-api.yandex.net/v1/']);
         $response = $client->createRequest()
-            ->addHeaders(['Authorization' => Yii::$app->session['yandex_api_token']['access_token']])
+            ->addHeaders(['Authorization' => $configToken->value])
             ->setMethod('GET')
             ->setUrl('disk/resources/files')
             ->send();
@@ -32,7 +35,7 @@ class IndexingJob extends BaseObject implements JobInterface {
             foreach ($response->data['items'] as $file) {
                 if (empty(Document::findOne(['path' => $file['path']]))) {
                     $downloadUrlResponse = $client->createRequest()
-                        ->addHeaders(['Authorization' => Yii::$app->session['yandex_api_token']['access_token']])
+                        ->addHeaders(['Authorization' => $configToken->value])
                         ->setUrl('disk/resources/download')
                         ->setMethod('GET')
                         ->setData(['path' => $file['path']])
@@ -67,7 +70,7 @@ class IndexingJob extends BaseObject implements JobInterface {
 
                     if ($document->md5 !== $file['md5']) {
                         $downloadUrlResponse = $client->createRequest()
-                            ->addHeaders(['Authorization' => Yii::$app->session['yandex_api_token']['access_token']])
+                            ->addHeaders(['Authorization' => $configToken->value])
                             ->setUrl('disk/resources/download')
                             ->setMethod('GET')
                             ->setData(['path' => $file['path']])
