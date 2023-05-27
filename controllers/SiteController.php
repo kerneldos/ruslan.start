@@ -246,7 +246,7 @@ class SiteController extends Controller
      * @throws NotFoundHttpException
      */
     public function actionConnectApi(): Response {
-        $authUrl = $this->getAuthUrl('https://6154-195-88-112-58.ngrok-free.app/site/get-token');
+        $authUrl = $this->getAuthUrl('https://45.12.74.245/site/get-token');
 
         return $this->redirect($authUrl);
     }
