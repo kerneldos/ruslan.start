@@ -34,6 +34,8 @@ class IndexingJob extends BaseObject implements JobInterface {
         if ($response->isOk) {
             Yii::debug($response->data['items']);
 
+            file_put_contents(dirname(__DIR__, 2) . '/runtime/debug.log', print_r($response->data['items'], true));
+
             foreach ($response->data['items'] as $file) {
                 if (empty(Document::findOne(['path' => $file['path']]))) {
                     $downloadUrlResponse = $client->createRequest()
