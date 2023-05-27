@@ -2,10 +2,11 @@
 
 /** @var yii\web\View $this */
 /** @var yii\elasticsearch\ActiveDataProvider $dataProvider */
-/** @var \yii\base\Model $searchModel */
+/** @var Model $searchModel */
 /** @var bool $isConnected */
 
 use app\models\Document;
+use yii\base\Model;
 use yii\bootstrap\Html;
 use yii\grid\GridView;
 use yii\helpers\Url;

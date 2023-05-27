@@ -22,7 +22,8 @@
         "yiisoft/yii2-httpclient": "*",
         "ext-zip": "*",
         "smalot/pdfparser": "^2.5",
-        "ext-fileinfo": "*"
+        "ext-fileinfo": "*",
+        "enqueue/amqp-lib": "^0.10.18"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
