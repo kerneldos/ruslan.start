@@ -23,7 +23,8 @@
         "ext-zip": "*",
         "smalot/pdfparser": "^2.5",
         "ext-fileinfo": "*",
-        "enqueue/amqp-lib": "^0.10.18"
+        "enqueue/amqp-lib": "^0.10.18",
+        "yiisoft/yii2-queue": "^2.3"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
