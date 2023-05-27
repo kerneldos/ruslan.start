@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\components\jobs\IndexingJob;
 use app\helpers\FileConverter;
 use app\models\Config;
 use app\models\Document;
@@ -139,81 +140,9 @@ class SiteController extends Controller
 
     /**
      * @return Response
-     * @throws Exception
-     * @throws InvalidConfigException
      */
     public function actionIndexing(): Response {
-        $client = new Client(['baseUrl' => 'https://cloud-api.yandex.net/v1/']);
-        $response = $client->createRequest()
-            ->addHeaders(['Authorization' => Yii::$app->session['yandex_api_token']['access_token']])
-            ->setMethod('GET')
-            ->setUrl('disk/resources/files')
-            ->send();
-
-        if ($response->isOk) {
-            foreach ($response->data['items'] as $file) {
-                if (empty(Document::findOne(['path' => $file['path']]))) {
-                    $downloadUrlResponse = $client->createRequest()
-                        ->addHeaders(['Authorization' => Yii::$app->session['yandex_api_token']['access_token']])
-                        ->setUrl('disk/resources/download')
-                        ->setMethod('GET')
-                        ->setData(['path' => $file['path']])
-                        ->send();
-
-                    $content = '';
-                    if ($downloadUrlResponse->isOk) {
-                        if (in_array($file['mime_type'], FileConverter::AVAILABLE_MIME_TYPES)) {
-                            $fileName = Yii::getAlias('@runtime/tempFile.data');
-                            $fileData = file_get_contents($downloadUrlResponse->data['href']);
-                            file_put_contents($fileName, $fileData);
-
-                            $converter = new FileConverter($fileName);
-                            $content   = $converter->convert($file['mime_type']);
-                            @unlink($fileName);
-                        }
-                    }
-
-                    $document = new Document([
-                        'name'       => $file['name'],
-                        'content'    => $content,
-                        'created'    => $file['created'],
-                        'mime_type'  => $file['mime_type'],
-                        'media_type' => $file['media_type'],
-                        'path'       => $file['path'],
-                        'sha256'     => $file['sha256'],
-                        'md5'        => $file['md5'],
-                    ]);
-                    $document->save();
-                } else {
-                    $document = Document::findOne(['path' => $file['path']]);
-
-                    if ($document->md5 !== $file['md5']) {
-                        $downloadUrlResponse = $client->createRequest()
-                            ->addHeaders(['Authorization' => Yii::$app->session['yandex_api_token']['access_token']])
-                            ->setUrl('disk/resources/download')
-                            ->setMethod('GET')
-                            ->setData(['path' => $file['path']])
-                            ->send();
-
-                        $content = '';
-                        if ($downloadUrlResponse->isOk) {
-                            if (in_array($file['mime_type'], FileConverter::AVAILABLE_MIME_TYPES)) {
-                                $fileName = Yii::getAlias('@runtime/tempFile.data');
-                                $fileData = file_get_contents($downloadUrlResponse->data['href']);
-                                file_put_contents($fileName, $fileData);
-
-                                $converter = new FileConverter($fileName);
-                                $content   = $converter->convert($file['mime_type']);
-                                @unlink($fileName);
-                            }
-                        }
-
-                        $document->content = $content;
-                        $document->save();
-                    }
-                }
-            }
-        }
+        Yii::$app->queue->push(new IndexingJob());
 
         Yii::$app->session->setFlash('indexingIsOk');
         return $this->redirect('index');

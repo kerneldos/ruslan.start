@@ -24,6 +24,10 @@ class Yii {
  * 
  */
 class __Application {
+    /**
+     * @var yii\queue\amqp_interop\Queue|object|null
+     */
+    public $queue;
 }
 
 /**
