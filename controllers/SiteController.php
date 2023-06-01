@@ -3,7 +3,6 @@
 namespace app\controllers;
 
 use app\components\jobs\IndexingJob;
-use app\helpers\FileConverter;
 use app\models\Config;
 use app\models\Document;
 use app\models\DocumentSearch;
