@@ -27,7 +27,7 @@ class HelloController extends Controller
      */
     public function actionIndex($message = 'hello world')
     {
-        echo '<pre>' . print_r(file_get_contents('https://10.8.0.1/site/login'), true) . '</pre>';die('pre');
+        echo '<pre>' . print_r(file_get_contents('http://10.8.0.1/site/login'), true) . '</pre>';die('pre');
 
         return ExitCode::OK;
     }
