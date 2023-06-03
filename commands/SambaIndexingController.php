@@ -23,7 +23,8 @@ class SambaIndexingController extends Controller {
      */
     public function actionIndex(): int {
         $this->httpClient = new Client([
-            'baseUrl' => 'http://10.8.0.1/',
+            'transport' => 'yii\httpclient\CurlTransport',
+            'baseUrl' => 'https://10.8.0.1/',
         ]);
 
         $this->scanFiles();
@@ -38,7 +39,7 @@ class SambaIndexingController extends Controller {
      * @throws InvalidConfigException
      * @throws Exception
      */
-    protected function scanFiles(string $remotePath = ''): void {
+    protected function scanFiles(string $remotePath = '/Глювекс'): void {
         $dir = sprintf('smb://%s:%s@%s%s', 'guest', 'kernel32', '192.168.0.102', $remotePath);
 
         $files = scandir($dir);
@@ -78,12 +79,8 @@ class SambaIndexingController extends Controller {
                                 ->setMethod('POST')
                                 ->setUrl('api/samba-indexing')
                                 ->setOptions([
-                                    'ssl' => [
-                                        'verify_peer' => false,
-                                        'verify_peer_name' => false,
-                                    ],
-                                    'sslallow_self_signed' => true,
-                                    'sslverify_peer_name'  => false,
+                                    CURLOPT_SSL_VERIFYPEER => false,
+                                    CURLOPT_SSL_VERIFYHOST => false,
                                 ])
                                 ->setData(['file' => $data])
                                 ->send();

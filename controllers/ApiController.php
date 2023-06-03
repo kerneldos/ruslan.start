@@ -13,6 +13,8 @@ class ApiController extends Controller {
      * @throws NotFoundHttpException
      */
     public function actionSambaIndexing() {
+        $this->enableCsrfValidation = false;
+
         $file = Yii::$app->request->post('file');
 
         if (!empty($file)) {
