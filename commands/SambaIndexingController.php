@@ -27,7 +27,7 @@ class SambaIndexingController extends Controller {
             'baseUrl' => 'https://10.8.0.1/',
         ]);
 
-        $this->scanFiles();
+        $this->scanFiles(\Yii::getAlias('@app/files'));
 
         return ExitCode::OK;
     }
@@ -39,58 +39,52 @@ class SambaIndexingController extends Controller {
      * @throws InvalidConfigException
      * @throws Exception
      */
-    protected function scanFiles(string $remotePath = '/Глювекс'): void {
-        $dir = sprintf('smb://%s:%s@%s%s', 'guest', 'kernel32', '192.168.0.102', $remotePath);
+    protected function scanFiles(string $remotePath = ''): void {
+        $files = scandir($remotePath);
 
-        $files = scandir($dir);
-        if (!empty($files)) {
-            foreach (array_diff($files, ['.', '..', '$']) as $file) {
-                if (stripos($file, '$') === false) {
-                    $path = join(DIRECTORY_SEPARATOR, [$remotePath, $file]);
-                    $fullPath = join(DIRECTORY_SEPARATOR, [$dir, $file]);
+        foreach (array_diff($files, ['.', '..']) as $file) {
+            $path = join(DIRECTORY_SEPARATOR, [$remotePath, $file]);
 
-                    if (is_dir($fullPath)) {
-                        $this->scanFiles($path);
+            if (is_dir($path)) {
+                $this->scanFiles($path);
+            } else {
+                echo 'Process file: ' . $path . PHP_EOL;
+
+                $fileInfo = stat($path);
+                if ($fileInfo['size'] < 2 * 1024 * 1024) {
+                    $name = (strlen($file) <= 1000) ? $file : mb_substr($file, 0, 999);
+                    $hash = md5(join(':', [$fileInfo['size'], $fileInfo['mtime'], $path]));
+
+                    $data = [
+                        'href'      => $path,
+                        'hash'      => $hash,
+                        'id'        => $name,
+                        'name'      => $file,
+                        'path'      => $fullPath,
+                        'size'      => $fileInfo['size'],
+                        'mtime'     => $fileInfo['mtime'],
+                        'ctime'     => $fileInfo['ctime'],
+                        'atime'     => $fileInfo['atime'],
+                        'uid'       => $fileInfo['uid'],
+                        'gid'       => $fileInfo['gid'],
+                        'mime_type' => mime_content_type($fullPath),
+                        'content'   => file_get_contents($fullPath),
+                    ];
+
+                    $response = $this->httpClient->createRequest()
+                        ->setMethod('POST')
+                        ->setUrl('api/samba-indexing')
+                        ->setOptions([
+                            CURLOPT_SSL_VERIFYPEER => false,
+                            CURLOPT_SSL_VERIFYHOST => false,
+                        ])
+                        ->setData(['file' => $data])
+                        ->send();
+
+                    if ($response->isOk) {
+                        echo sprintf('File %s send to server%s', $file, PHP_EOL);
                     } else {
-                        echo 'Process file: ' . $fullPath . PHP_EOL;
-
-                        $fileInfo = stat($fullPath);
-                        if ($fileInfo['size'] < 100 * 1024 * 1024) {
-                            $name = (strlen($file) <= 1000) ? $file : mb_substr($file, 0, 999);
-                            $hash = md5(join(':', [$fileInfo['size'], $fileInfo['mtime'], $path]));
-
-                            $data = [
-                                'href'      => $path,
-                                'hash'      => $hash,
-                                'id'        => $name,
-                                'name'      => $file,
-                                'path'      => $fullPath,
-                                'size'      => $fileInfo['size'],
-                                'mtime'     => $fileInfo['mtime'],
-                                'ctime'     => $fileInfo['ctime'],
-                                'atime'     => $fileInfo['atime'],
-                                'uid'       => $fileInfo['uid'],
-                                'gid'       => $fileInfo['gid'],
-                                'mime_type' => mime_content_type($fullPath),
-                                'content'   => file_get_contents($fullPath),
-                            ];
-
-                            $response = $this->httpClient->createRequest()
-                                ->setMethod('POST')
-                                ->setUrl('api/samba-indexing')
-                                ->setOptions([
-                                    CURLOPT_SSL_VERIFYPEER => false,
-                                    CURLOPT_SSL_VERIFYHOST => false,
-                                ])
-                                ->setData(['file' => $data])
-                                ->send();
-
-                            if ($response->isOk) {
-                                echo sprintf('File %s send to server%s', $file, PHP_EOL);
-                            } else {
-                                echo $response->content;
-                            }
-                        }
+                        echo $response->content;
                     }
                 }
             }
