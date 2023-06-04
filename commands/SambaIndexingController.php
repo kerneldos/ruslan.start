@@ -60,15 +60,15 @@ class SambaIndexingController extends Controller {
                         'hash'      => $hash,
                         'id'        => $name,
                         'name'      => $file,
-                        'path'      => $fullPath,
+                        'path'      => $path,
                         'size'      => $fileInfo['size'],
                         'mtime'     => $fileInfo['mtime'],
                         'ctime'     => $fileInfo['ctime'],
                         'atime'     => $fileInfo['atime'],
                         'uid'       => $fileInfo['uid'],
                         'gid'       => $fileInfo['gid'],
-                        'mime_type' => mime_content_type($fullPath),
-                        'content'   => file_get_contents($fullPath),
+                        'mime_type' => mime_content_type($path),
+                        'content'   => file_get_contents($path),
                     ];
 
                     $response = $this->httpClient->createRequest()
