@@ -8,6 +8,7 @@ use yii\elasticsearch\Exception;
 
 /**
  * @property string $_id
+ * @property string $type
  * @property string $name
  * @property string $content
  * @property string $created
