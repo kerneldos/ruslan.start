@@ -25,7 +25,7 @@ class Document extends ActiveRecord
      * @return string[]
      */
     public function attributes(): array {
-        return ['name', 'content', 'created', 'mime_type', 'file', 'media_type', 'path', 'sha256', 'md5'];
+        return ['name', 'content', 'created', 'mime_type', 'file', 'media_type', 'path', 'sha256', 'md5', 'type'];
     }
 
     /**

@@ -86,6 +86,8 @@ class SambaIndexingController extends Controller {
                     } else {
                         echo $response->content;
                     }
+                } else {
+                    echo $fileInfo['size'] . PHP_EOL;
                 }
             }
         }
