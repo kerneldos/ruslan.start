@@ -216,7 +216,7 @@ class SiteController extends Controller
 
             $content = file_get_contents($response->data['href']);
         } else {
-            $client = new Client(['baseUrl' => 'http://10.8.0.6:8000/api/']);
+            $client = new Client(['baseUrl' => 'http://10.8.0.6/api/']);
             $response = $client->createRequest()
                 ->setUrl('samba-download')
                 ->setMethod('GET')
