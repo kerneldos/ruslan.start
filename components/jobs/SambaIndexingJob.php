@@ -31,6 +31,7 @@ class SambaIndexingJob extends BaseObject implements JobInterface {
             }
 
             $document = new Document([
+                'type'       => 'samba',
                 'name'       => $file['name'],
                 'content'    => $content,
                 'created'    => $file['ctime'],

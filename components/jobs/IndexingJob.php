@@ -60,6 +60,7 @@ class IndexingJob extends BaseObject implements JobInterface {
 
                     $document = new Document([
                         'name'       => $file['name'],
+                        'type'       => 'yandex',
                         'content'    => $content,
                         'created'    => $file['created'],
                         'mime_type'  => $file['mime_type'],

@@ -36,11 +36,12 @@ class Document extends ActiveRecord
             'properties' => [
                 'name'       => ['type' => 'text', 'fielddata' => 'true'],
                 'content'    => ['type' => 'text'],
-                'created'    => ['type' => 'text'],
+                'created'    => ['type' => 'date'],
                 'mime_type'  => ['type' => 'text'],
                 'file'       => ['type' => 'text'],
                 'media_type' => ['type' => 'text'],
                 'path'       => ['type' => 'keyword'],
+                'type'       => ['type' => 'keyword'],
                 'sha256'     => ['type' => 'text'],
                 'md5'        => ['type' => 'text'],
             ]

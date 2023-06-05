@@ -27,11 +27,9 @@ class SiteController extends Controller
     public function behaviors(): array {
         return [
             'access' => [
-                'class' => AccessControl::class,
-                'only' => ['logout'],
+                'class' => 'yii\filters\AccessControl',
                 'rules' => [
                     [
-                        'actions' => ['logout'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -190,23 +188,41 @@ class SiteController extends Controller
     /**
      * @param string $path
      * @param string $name
+     * @param string $type
      *
      * @return Response
      * @throws Exception
      * @throws InvalidConfigException
      * @throws RangeNotSatisfiableHttpException
      */
-    public function actionDownload(string $path, string $name): Response {
-        $client = new Client(['baseUrl' => 'https://cloud-api.yandex.net/v1/']);
-        $response = $client->createRequest()
-            ->addHeaders(['Authorization' => Yii::$app->session['yandex_api_token']['access_token']])
-            ->setUrl('disk/resources/download')
-            ->setMethod('GET')
-            ->setData(['path' => $path])
-            ->send();
+    public function actionDownload(string $path, string $name, string $type): Response {
+        if ($type === 'yandex') {
+            if (empty(Yii::$app->session['yandex_api_token'])) {
+                return $this->redirect('/site/connect-api');
+            }
+
+            $client = new Client(['baseUrl' => 'https://cloud-api.yandex.net/v1/']);
+            $response = $client->createRequest()
+                ->addHeaders(['Authorization' => Yii::$app->session['yandex_api_token']['access_token']])
+                ->setUrl('disk/resources/download')
+                ->setMethod('GET')
+                ->setData(['path' => $path])
+                ->send();
+
+            $content = file_get_contents($response->data['href']);
+        } else {
+            $client = new Client(['baseUrl' => 'http://10.8.0.6:8000/api/']);
+            $response = $client->createRequest()
+                ->setUrl('samba-download')
+                ->setMethod('GET')
+                ->setData(['path' => $path])
+                ->send();
+
+            $content = $response->data['content'];
+        }
 
         if ($response->isOk) {
-            return Yii::$app->response->sendContentAsFile(file_get_contents($response->data['href']), $name);
+            return Yii::$app->response->sendContentAsFile($content, $name);
         }
 
         return $this->redirect('index');

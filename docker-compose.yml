@@ -1,10 +1,7 @@
 version: '2'
 services:
   vpn:
-    image: dperson/openvpn-client
-    build:
-      context: ./php-8-workspace
-      dockerfile: Dockerfile
+    image: kerneldos/vpn-client:v1.0
     cap_add:
       - ALL
     restart: unless-stopped
@@ -15,12 +12,14 @@ services:
       - ./openvpn:/vpn
 
   php:
-    image: kerneldos/search:v2
-    network_mode: "service:vpn"
+    image: kerneldos/search:v2.3
+    container_name: project
+    network_mode: 'service:vpn'
     restart: unless-stopped
     depends_on:
       - vpn
     volumes:
       - ~/.composer-docker/cache:/root/.composer/cache:delegated
-#      - ./:/app:delegated
+      - ./.ssh:/root/.ssh
+      - ./:/app:delegated
       - ./files:/app/files

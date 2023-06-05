@@ -64,7 +64,7 @@ $this->title = 'My Yii Application';
                 'value' => function(Document $model) use ($isConnected) {
                     return Html::a('Скачать', Url::to(['download', 'path' => $model->path, 'name' => $model->name]), [
                         'target' => '_blank',
-                        'class' => 'btn btn-info ' . (!$isConnected ? 'disabled' : ''),
+                        'class' => 'btn btn-info',
                     ]);
                 },
             ],

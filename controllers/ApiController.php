@@ -6,6 +6,7 @@ use app\components\jobs\SambaIndexingJob;
 use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 
 class ApiController extends Controller {
@@ -23,5 +24,16 @@ class ApiController extends Controller {
         }
 
         throw new NotFoundHttpException('File not found');
+    }
+
+    /**
+     * @param string $path
+     *
+     * @return array
+     */
+    public function actionSambaDownload(string $path): array {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        return ['content' => file_get_contents(Yii::getAlias($path))];
     }
 }
