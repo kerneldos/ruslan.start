@@ -223,7 +223,7 @@ class SiteController extends Controller
                 ->setData(['path' => $path])
                 ->send();
 
-            $content = $response->data['content'];
+            $content = $response->data;
         }
 
         if ($response->isOk) {

@@ -29,11 +29,9 @@ class ApiController extends Controller {
     /**
      * @param string $path
      *
-     * @return array
+     * @return false|string
      */
-    public function actionSambaDownload(string $path): array {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-
-        return ['content' => file_get_contents($path)];
+    public function actionSambaDownload(string $path) {
+        return file_get_contents($path);
     }
 }
