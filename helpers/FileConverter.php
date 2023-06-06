@@ -30,6 +30,9 @@ class FileConverter
         'application/x-httpd-php',
         'application/json',
         'application/xml',
+        'image/jpeg',
+        'image/png',
+        'image/bmp',
     ];
 
     private string $filename;
@@ -234,6 +237,20 @@ class FileConverter
     }
 
     /**
+     * @return string
+     */
+    public function convertImages(): string {
+        $outFileName = \Yii::getAlias('@runtime/out');
+        exec('tesseract ' . $this->filename . ' ' . $outFileName . ' -l rus+eng');
+
+        $content = file_get_contents(\Yii::getAlias('@runtime/out.txt'));
+
+        unlink(\Yii::getAlias('@runtime/out.txt'));
+
+        return $content;
+    }
+
+    /**
      * @param string $mimeType
      *
      * @return array|false|string|string[]|null
@@ -285,6 +302,11 @@ class FileConverter
             case 'application/json':
             case 'application/xml':
                 return file_get_contents($this->filename) ?? '';
+
+            case 'image/jpeg':
+            case 'image/png':
+            case 'image/bmp':
+                return $this->convertImages();
 
             default:
                 return 'Invalid File Type';
