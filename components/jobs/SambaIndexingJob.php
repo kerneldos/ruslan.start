@@ -23,7 +23,7 @@ class SambaIndexingJob extends BaseObject implements JobInterface {
             $content = '';
             if (in_array($file['mime_type'], FileConverter::AVAILABLE_MIME_TYPES)) {
                 $fileName = Yii::getAlias('@runtime/' . $file['name']);
-                file_put_contents($fileName, $file['content']);
+                file_put_contents($fileName, base64_decode($file['content']));
 
                 $converter = new FileConverter($fileName);
                 $content   = $converter->convert($file['mime_type']);

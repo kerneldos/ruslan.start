@@ -68,7 +68,7 @@ class SambaIndexingController extends Controller {
                         'uid'       => $fileInfo['uid'],
                         'gid'       => $fileInfo['gid'],
                         'mime_type' => mime_content_type($path),
-                        'content'   => file_get_contents($path),
+                        'content'   => base64_encode(file_get_contents($path)),
                     ];
 
                     $response = $this->httpClient->createRequest()

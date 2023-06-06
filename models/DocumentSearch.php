@@ -45,9 +45,12 @@ class DocumentSearch extends Model
         // grid filtering conditions
         if (!empty($this->content)) {
             $query->query([
-                'query_string' => [
-                    'query' => '*' . $this->content . '*',
-                    'analyze_wildcard' => true,
+                'simple_query_string' => [
+                    'query' => $this->content,
+                    'fields' => [
+                        'content',
+                        'name^2',
+                    ],
                 ],
             ]);
         }
