@@ -13,7 +13,7 @@ class ApiController extends Controller {
     /**
      * @throws NotFoundHttpException
      */
-    public function actionSambaIndexing() {
+    public function actionSambaIndexing(): array {
         Yii::$app->request->enableCsrfValidation = false;
         $this->enableCsrfValidation = false;
 
@@ -21,6 +21,10 @@ class ApiController extends Controller {
 
         if (!empty($file)) {
             Yii::$app->queue->push(new SambaIndexingJob(['file' => $file]));
+
+            Yii::$app->response->format = Response::FORMAT_JSON;
+
+            return ['success' => true];
         }
 
         throw new NotFoundHttpException('File not found');
