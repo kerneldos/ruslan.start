@@ -1,5 +1,6 @@
 <?php
 
+use app\models\Document;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\DetailView;
@@ -13,9 +14,6 @@ $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 <div class="config-view">
-
-    <h1><?= Html::encode($this->title) ?></h1>
-
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
@@ -25,10 +23,10 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'file',
                 'format' => 'raw',
-                'value' => function($model) use ($isConnected) {
-                    return Html::a('Скачать', Url::to(['download', 'path' => $model->path, 'name' => $model->name]), [
+                'value' => function(Document $model) {
+                    return Html::a('Скачать', Url::to(['download', 'path' => $model->path, 'name' => $model->name, 'type' => $model->type]), [
                         'target' => '_blank',
-                        'class' => 'btn btn-info ' . (!$isConnected ? 'disabled' : ''),
+                        'class' => 'btn btn-info',
                     ]);
                 },
             ],

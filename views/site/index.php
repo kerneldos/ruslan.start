@@ -61,7 +61,7 @@ $this->title = 'My Yii Application';
             [
                 'attribute' => 'file',
                 'format' => 'raw',
-                'value' => function(Document $model) use ($isConnected) {
+                'value' => function(Document $model) {
                     return Html::a('Скачать', Url::to(['download', 'path' => $model->path, 'name' => $model->name, 'type' => $model->type]), [
                         'target' => '_blank',
                         'class' => 'btn btn-info',
