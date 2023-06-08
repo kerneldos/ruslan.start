@@ -11,7 +11,7 @@ use yii\bootstrap\Html;
 use yii\grid\GridView;
 use yii\helpers\Url;
 
-$this->title = 'My Yii Application';
+$this->title = 'Search Project';
 ?>
 <div class="site-index">
 
