@@ -2,21 +2,11 @@
 
 namespace app\models;
 
-use yii\base\Model;
+use stdClass;
 use yii\elasticsearch\ActiveDataProvider;
 
-class DocumentSearch extends Model
+class DocumentSearch extends Document
 {
-    public $name;
-    public $content;
-    public $created;
-    public $mime_type;
-    public $file;
-    public $media_type;
-    public $path;
-    public $sha256;
-    public $md5;
-
     /**
      * Creates data provider instance with search query applied
      *
@@ -25,9 +15,11 @@ class DocumentSearch extends Model
      * @return ActiveDataProvider
      */
     public function search(array $params): ActiveDataProvider {
-        $query = Document::find();
-
-        // add conditions that should always apply here
+        $query = Document::find()->highlight([
+            'pre_tags' => ['<strong>'],  //default is <em>
+            'post_tags' => ['</strong>'],
+            'fields' => ['content' => new stdClass()],
+        ]);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

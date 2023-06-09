@@ -16,9 +16,15 @@ use yii\widgets\ActiveForm;
         'method' => 'get',
     ]); ?>
 
-    <?= $form->field($model, 'content')->label('Поиск:') ?>
-
-    <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
+    <div class="input-group input-group-lg">
+        <?= Html::activeInput('search', $model, 'content', [
+            'class' => 'form-control form-control-lg',
+            'placeholder' => 'Найти',
+        ]) ?>
+        <div class="input-group-append">
+            <?= Html::submitButton('<i class="fa fa-search"></i>', ['class' => 'btn btn-lg btn-default']) ?>
+        </div>
+    </div>
 
     <?php ActiveForm::end(); ?>
 

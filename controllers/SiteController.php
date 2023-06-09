@@ -6,10 +6,10 @@ use app\components\jobs\IndexingJob;
 use app\models\Config;
 use app\models\Document;
 use app\models\DocumentSearch;
+use app\models\Tag;
 use yii\base\InvalidConfigException;
 use yii\httpclient\Client;
 use Yii;
-use yii\filters\AccessControl;
 use yii\httpclient\Exception;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -73,10 +73,12 @@ class SiteController extends Controller
         $searchModel = new DocumentSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
+        $tags = Tag::find()->all();
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'isConnected' => !empty(Yii::$app->session['yandex_api_token']),
+            'tags' => $tags,
         ]);
     }
 
