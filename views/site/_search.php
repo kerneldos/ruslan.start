@@ -1,11 +1,11 @@
 <?php
 
-use yii\base\Model;
+use app\models\DocumentSearch;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /** @var yii\web\View $this */
-/** @var Model $model */
+/** @var DocumentSearch $model */
 /** @var yii\widgets\ActiveForm $form */
 ?>
 
@@ -21,9 +21,16 @@ use yii\widgets\ActiveForm;
             'class' => 'form-control form-control-lg',
             'placeholder' => 'Найти',
         ]) ?>
-        <div class="input-group-append">
-            <?= Html::submitButton('<i class="fa fa-search"></i>', ['class' => 'btn btn-lg btn-default']) ?>
-        </div>
+
+        <?php if (empty($model->content)): ?>
+            <div class="input-group-append">
+                <?= Html::submitButton('<i class="fa fa-search"></i>', ['class' => 'btn btn-lg btn-default']) ?>
+            </div>
+        <?php else: ?>
+            <div class="input-group-append">
+                <a href="/site/index" class="btn btn-default"><i class="fa fa-times"></i></a>
+            </div>
+        <?php endif; ?>
     </div>
 
     <?php ActiveForm::end(); ?>
