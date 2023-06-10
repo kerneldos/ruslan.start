@@ -8,7 +8,7 @@ use yii\helpers\Url;
 /** @var Document $model */
 ?>
 
-<div class="list-group-item">
+<div class="list-group-item my-1">
     <div class="row">
         <div class="col px-4">
             <div>

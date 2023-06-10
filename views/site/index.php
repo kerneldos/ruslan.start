@@ -36,6 +36,21 @@ $this->title = 'Search Project';
                             'dataProvider' => $dataProvider,
                             'itemView' => '_list',
                             'layout' => "{items}\n{pager}",
+                            'pager' => [
+                                'options' => [
+                                    'class' => 'pagination mt-2',
+                                ],
+
+                                // Customzing CSS class for pager link
+                                'linkOptions' => ['class' => 'page-link'],
+                                'pageCssClass' => 'paginate_button page-item',
+                                'activePageCssClass' => 'paginate_button page-item active',
+
+                                // Customzing CSS class for navigating link
+                                'prevPageCssClass' => 'paginate_button page-item previous',
+                                'nextPageCssClass' => 'paginate_button page-item next',
+                                'disabledListItemSubTagOptions' => ['tag' => 'a', 'class' => 'page-link'],
+                            ],
                         ]); ?>
                     </div>
                 </div>
