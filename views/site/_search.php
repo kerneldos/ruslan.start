@@ -9,7 +9,7 @@ use yii\widgets\ActiveForm;
 /** @var yii\widgets\ActiveForm $form */
 ?>
 
-<div class="document-search">
+<div class="document-search mb-5">
 
     <?php $form = ActiveForm::begin([
         'action' => ['index'],

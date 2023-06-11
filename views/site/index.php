@@ -13,45 +13,46 @@ use yii\widgets\ListView;
 $this->title = 'Search Project';
 ?>
 <div class="site-index">
-
-    <div class="content-header">
-        <div class="container-fluid">
-            <?php foreach ($tags as $tag): ?>
-                <a href="?DocumentSearch[content]=<?= $tag->name ?>" class="col-md-2 btn btn-default"><?= $tag->name ?></a>
-            <?php endforeach; ?>
-        </div>
-    </div>
-
     <section class="content">
         <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-8 offset-md-2">
-                    <?php echo $this->render('_search', ['model' => $searchModel]); ?>
+            <div class="row flex-nowrap">
+                <div class="col-lg-10">
+                    <div class="card">
+                        <div class="card-body">
+                            <?php echo $this->render('_search', ['model' => $searchModel]); ?>
+
+                            <div class="list-group">
+                                <?= ListView::widget([
+                                    'dataProvider' => $dataProvider,
+                                    'itemView' => '_list',
+                                    'layout' => "{items}\n{pager}",
+                                    'pager' => [
+                                        'options' => [
+                                            'class' => 'pagination mt-2',
+                                        ],
+
+                                        // Customzing CSS class for pager link
+                                        'linkOptions' => ['class' => 'page-link'],
+                                        'pageCssClass' => 'paginate_button page-item',
+                                        'activePageCssClass' => 'paginate_button page-item active',
+
+                                        // Customzing CSS class for navigating link
+                                        'prevPageCssClass' => 'paginate_button page-item previous',
+                                        'nextPageCssClass' => 'paginate_button page-item next',
+                                        'disabledListItemSubTagOptions' => ['tag' => 'a', 'class' => 'page-link'],
+                                    ],
+                                ]); ?>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-md-12">
-                    <div class="list-group">
-                        <?= ListView::widget([
-                            'dataProvider' => $dataProvider,
-                            'itemView' => '_list',
-                            'layout' => "{items}\n{pager}",
-                            'pager' => [
-                                'options' => [
-                                    'class' => 'pagination mt-2',
-                                ],
-
-                                // Customzing CSS class for pager link
-                                'linkOptions' => ['class' => 'page-link'],
-                                'pageCssClass' => 'paginate_button page-item',
-                                'activePageCssClass' => 'paginate_button page-item active',
-
-                                // Customzing CSS class for navigating link
-                                'prevPageCssClass' => 'paginate_button page-item previous',
-                                'nextPageCssClass' => 'paginate_button page-item next',
-                                'disabledListItemSubTagOptions' => ['tag' => 'a', 'class' => 'page-link'],
-                            ],
-                        ]); ?>
+                <div class="clo-lg-2">
+                    <div class="card">
+                        <div class="card-body">
+                            <?php foreach ($tags as $tag): ?>
+                                <a href="?DocumentSearch[content]=<?= $tag->name ?>" class="btn btn-default mb-1"><?= $tag->name ?></a>
+                            <?php endforeach; ?>
+                        </div>
                     </div>
                 </div>
             </div>
