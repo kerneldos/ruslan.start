@@ -321,6 +321,45 @@ class SiteController extends Controller
     }
 
     /**
+     * @return Response
+     */
+    public function actionTestIndexing(): Response {
+        $documents = [
+            [
+                'name'       => 'Москва.jpg',
+                'content'    => 'метро.мкад',
+                'created'    => time(),
+                'mime_type'  => 'text/plain',
+                'file'       => 'Москва.jpg',
+                'media_type' => 'text',
+                'path'       => 'Москва.jpg',
+                'type'       => 'image',
+                'sha256'     => 'cfdvdvfdvcsdvgfewgf',
+                'md5'        => 'vdvdvdvdv',
+            ],
+            [
+                'name'       => 'Word document.docx',
+                'content'    => 'рыба текст это хороший фариант',
+                'created'    => time(),
+                'mime_type'  => 'text/plain',
+                'file'       => 'Word document.docx',
+                'media_type' => 'text',
+                'path'       => 'Word document.docx',
+                'type'       => 'image',
+                'sha256'     => 'cfdvdvfdvcsdvgfewgf',
+                'md5'        => 'vdvdvdvdv',
+            ],
+        ];
+
+        foreach ($documents as $document) {
+            $file = new Document($document);
+            $file->save();
+        }
+
+        return $this->redirect('index');
+    }
+
+    /**
      * @param string $id
      *
      * @return Document|null

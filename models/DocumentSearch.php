@@ -38,11 +38,17 @@ class DocumentSearch extends Document
         if (!empty($this->content)) {
             $query->query([
                 'simple_query_string' => [
-                    'query' => $this->content,
                     'fields' => [
-                        'content',
                         'name^2',
+                        'name.exact^2',
+                        'content',
+                        'content.exact',
                     ],
+                    'query' => $this->content,
+                    'default_operator' => 'or',
+                    'analyze_wildcard' => true,
+                    'minimum_should_match' => '-35%',
+                    'quote_field_suffix' => '.exact',
                 ],
             ]);
         }

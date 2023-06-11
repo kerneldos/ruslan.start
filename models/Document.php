@@ -78,17 +78,33 @@ class Document extends ActiveRecord
                         'type' => 'stemmer',
                         'language' => 'russian',
                     ],
+                    'word_delimiter' => [
+                        'catenate_all' => true,
+                        'type' => 'word_delimiter',
+                        'preserve_original' => true,
+                    ],
+                ],
+                'char_filter' => [
+                    'yo_filter' => [
+                        'type' => 'mapping',
+                        'mappings' => [
+                            'ё' => 'е',
+                            'Ё' => 'Е',
+                        ],
+                    ],
                 ],
                 'analyzer' => [
                     'default' => [
                         'char_filter' => [
-                            'html_strip'
+                            'html_strip',
+                            'yo_filter',
                         ],
                         'tokenizer' => 'standard',
                         'filter' => [
                             'lowercase',
                             'ru_stop',
-                            'ru_stemmer'
+                            'ru_stemmer',
+                            'word_delimiter',
                         ],
                     ],
                 ],
@@ -126,6 +142,6 @@ class Document extends ActiveRecord
     {
         $db = static::getDb();
         $command = $db->createCommand();
-        $command->deleteIndex(static::index(), static::type());
+        $command->deleteIndex(static::index());
     }
 }
