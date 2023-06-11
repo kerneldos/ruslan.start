@@ -58,19 +58,6 @@ $config = [
                 '<_a:login|logout>' => 'site/<_a>',
             ],
         ],
-        'elasticsearch' => [
-            'class' => 'yii\elasticsearch\Connection',
-            'nodes' => [
-                ['http_address' => '192.168.0.102:9200'],
-            ],
-            'autodetectCluster' => false,
-            'dslVersion' => 7, // по умолчанию - 5
-            'defaultProtocol' => 'http',
-            'auth' => [
-                'username' => 'admin',
-                'password' => 'admin',
-            ],
-        ],
     ],
     'params' => $params,
 ];
