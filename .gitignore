@@ -36,3 +36,4 @@ tests/_support/_generated
 /.vagrant
 /openvpn/*
 /files/
+/config/config.local.php
