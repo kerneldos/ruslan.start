@@ -18,7 +18,7 @@ use yii\elasticsearch\Exception;
  * @property string $path
  * @property string $sha256
  * @property string $md5
- * @property string $attachment
+ * @property array $attachment
  */
 class Document extends ActiveRecord
 {

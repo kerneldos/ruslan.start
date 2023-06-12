@@ -32,7 +32,13 @@ YiiAsset::register($this);
                 },
             ],
             'media_type',
-            'content',
+            [
+                'attribute' => 'content',
+                'format' => 'raw',
+                'value' => function(Document $model) {
+                    return $model->attachment['content'];
+                },
+            ],
         ],
     ]) ?>
 
