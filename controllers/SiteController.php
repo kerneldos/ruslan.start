@@ -327,24 +327,24 @@ class SiteController extends Controller
         $documents = [
             [
                 'name'       => 'Москва.jpg',
-                'content'    => 'метро.мкад',
+                'content'    => base64_encode('метро.мкад'),
                 'created'    => time(),
                 'mime_type'  => 'text/plain',
                 'file'       => 'Москва.jpg',
                 'media_type' => 'text',
-                'path'       => 'Москва.jpg',
+                'path'       => 'Москва.jpg2',
                 'type'       => 'image',
                 'sha256'     => 'cfdvdvfdvcsdvgfewgf',
                 'md5'        => 'vdvdvdvdv',
             ],
             [
                 'name'       => 'Word document.docx',
-                'content'    => 'рыба текст это хороший фариант',
+                'content'    => base64_encode('рыба текст это хороший фариант'),
                 'created'    => time(),
                 'mime_type'  => 'text/plain',
                 'file'       => 'Word document.docx',
                 'media_type' => 'text',
-                'path'       => 'Word document.docx',
+                'path'       => 'Word document.docx3',
                 'type'       => 'image',
                 'sha256'     => 'cfdvdvfdvcsdvgfewgf',
                 'md5'        => 'vdvdvdvdv',
@@ -353,7 +353,7 @@ class SiteController extends Controller
 
         foreach ($documents as $document) {
             $file = new Document($document);
-            $file->save();
+            $file->insert(true, array_keys($document), ['pipeline' => 'attachment']);
         }
 
         return $this->redirect('index');
