@@ -18,6 +18,7 @@ use yii\elasticsearch\Exception;
  * @property string $path
  * @property string $sha256
  * @property string $md5
+ * @property string $attachment
  */
 class Document extends ActiveRecord
 {
@@ -45,6 +46,7 @@ class Document extends ActiveRecord
                 'type'       => ['type' => 'keyword'],
                 'sha256'     => ['type' => 'text'],
                 'md5'        => ['type' => 'text'],
+                'attachment' => ['type' => 'object'],
             ]
         ];
     }
