@@ -90,8 +90,8 @@ class Document extends ActiveRecord
                     'yo_filter' => [
                         'type' => 'mapping',
                         'mappings' => [
-                            'ё' => 'е',
-                            'Ё' => 'Е',
+                            'ё => е',
+                            'Ё => Е',
                         ],
                     ],
                 ],
