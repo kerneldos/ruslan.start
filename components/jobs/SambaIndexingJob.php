@@ -20,28 +20,29 @@ class SambaIndexingJob extends BaseObject implements JobInterface {
         $file = $this->file;
 
         if (empty(Document::findOne(['path' => $file['path']]))) {
-            $content = '';
-            if (in_array($file['mime_type'], FileConverter::AVAILABLE_MIME_TYPES)) {
-                $fileName = Yii::getAlias('@runtime/' . $file['name']);
-                file_put_contents($fileName, base64_decode($file['content']));
+//            $content = '';
+//            if (in_array($file['mime_type'], FileConverter::AVAILABLE_MIME_TYPES)) {
+//                $fileName = Yii::getAlias('@runtime/' . $file['name']);
+//                file_put_contents($fileName, base64_decode($file['content']));
+//
+//                $converter = new FileConverter($fileName);
+//                $content   = $converter->convert($file['mime_type']);
+//                @unlink($fileName);
+//            }
 
-                $converter = new FileConverter($fileName);
-                $content   = $converter->convert($file['mime_type']);
-                @unlink($fileName);
-            }
-
-            $document = new Document([
+            $fields = [
                 'type'       => 'samba',
                 'name'       => $file['name'],
-                'content'    => $content,
+                'content'    => $file['content'],
                 'created'    => $file['ctime'],
                 'mime_type'  => $file['mime_type'],
                 'media_type' => $file['mime_type'],
                 'path'       => $file['path'],
                 'sha256'     => $file['hash'],
                 'md5'        => $file['hash'],
-            ]);
-            $document->save();
+            ];
+            $document = new Document($fields);
+            $document->insert(true, array_keys($fields), ['pipeline' => 'attachment']);
         } else {
             $document = Document::findOne(['path' => $file['path']]);
 
