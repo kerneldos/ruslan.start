@@ -4,9 +4,15 @@ namespace app\models;
 
 use stdClass;
 use yii\elasticsearch\ActiveDataProvider;
+use yii\helpers\ArrayHelper;
 
+/**
+ *
+ */
 class DocumentSearch extends Document
 {
+    public array $tags = [];
+
     /**
      * Creates data provider instance with search query applied
      *
@@ -34,9 +40,10 @@ class DocumentSearch extends Document
             return $dataProvider;
         }
 
-        // grid filtering conditions
+        $should = [];
+
         if (!empty($this->content)) {
-            $query->query([
+            $should[] = [
                 'simple_query_string' => [
                     'fields' => [
                         'name^2',
@@ -46,6 +53,26 @@ class DocumentSearch extends Document
                     'default_operator' => 'or',
                     'analyze_wildcard' => true,
                     'minimum_should_match' => '-35%',
+                ],
+            ];
+
+//            $should[] = [
+//                'match' => ['attachment.content' => $this->content],
+//            ];
+        }
+
+        if (!empty($this->tags)) {
+            foreach ($this->tags as $tag) {
+                $should[] = [
+                    'match' => ['attachment.content' => $tag],
+                ];
+            }
+        }
+
+        if (!empty($should)) {
+            $query->query([
+                'bool' => [
+                    'should' => $should,
                 ],
             ]);
         }
@@ -60,6 +87,7 @@ class DocumentSearch extends Document
     {
         return [
             [['name', 'content', 'created', 'mime_type', 'file', 'media_type', 'path', 'sha256', 'md5'], 'string'],
+            ['tags', 'safe'],
         ];
     }
 }

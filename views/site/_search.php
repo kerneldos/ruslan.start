@@ -1,12 +1,14 @@
 <?php
 
 use app\models\DocumentSearch;
+use app\models\Tag;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /** @var yii\web\View $this */
 /** @var DocumentSearch $model */
 /** @var yii\widgets\ActiveForm $form */
+/** @var Tag[] $tags */
 ?>
 
 <div class="document-search mb-5">
@@ -31,6 +33,20 @@ use yii\widgets\ActiveForm;
                 <a href="/site/index" class="btn btn-default"><i class="fa fa-times"></i></a>
             </div>
         <?php endif; ?>
+    </div>
+
+    <div class="form-group mt-1">
+        <label>Тэги</label>
+        <select class="select2" multiple="multiple" data-placeholder="..." style="width: 100%;" name="DocumentSearch[tags][]">
+            <?php foreach ($tags as $tag): ?>
+                <?php $selected = in_array($tag->name, $_GET['DocumentSearch']['tags'] ?? []) ? 'selected' : '' ?>
+                <option <?= $selected ?> value="<?= $tag->name ?>"><?= $tag->name ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+
+    <div class="form-group mt-1">
+        <button type="submit" class="js-submit btn btn-primary">Найти</button>
     </div>
 
     <?php ActiveForm::end(); ?>

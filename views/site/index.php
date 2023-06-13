@@ -19,7 +19,7 @@ $this->title = 'Search Project';
                 <div class="col-lg-10">
                     <div class="card">
                         <div class="card-body">
-                            <?php echo $this->render('_search', ['model' => $searchModel]); ?>
+                            <?php echo $this->render('_search', ['model' => $searchModel, 'tags' => $tags]); ?>
 
                             <div class="list-group">
                                 <?= ListView::widget([
@@ -50,7 +50,7 @@ $this->title = 'Search Project';
                     <div class="card">
                         <div class="card-body">
                             <?php foreach ($tags as $tag): ?>
-                                <a href="?DocumentSearch[content]=<?= $tag->name ?>" class="btn btn-default mb-1"><?= $tag->name ?></a>
+                                <a data-value="<?= $tag->name ?>" href="" class="js-tags btn btn-default mb-1"><?= $tag->name ?></a>
                             <?php endforeach; ?>
                         </div>
                     </div>

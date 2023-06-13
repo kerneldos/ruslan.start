@@ -26,6 +26,7 @@ class AppAsset extends AssetBundle
         'plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css',
         'plugins/icheck-bootstrap/icheck-bootstrap.min.css',
         'plugins/jqvmap/jqvmap.min.css',
+        'plugins/select2/css/select2.min.css',
         'dist/css/adminlte.min.css',
         'plugins/overlayScrollbars/css/OverlayScrollbars.min.css',
         'plugins/summernote/summernote-bs4.min.css',
@@ -46,6 +47,7 @@ class AppAsset extends AssetBundle
         'plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js',
         'dist/js/adminlte.js',
 //        'dist/js/demo.js',
+        'plugins/select2/js/select2.full.min.js',
         'dist/js/pages/dashboard.js',
         'js/app.js',
     ];
