@@ -6,34 +6,35 @@ use app\helpers\FileConverter;
 use app\models\Document;
 use Yii;
 use yii\base\BaseObject;
+use yii\db\StaleObjectException;
+use yii\elasticsearch\Exception;
 use yii\queue\JobInterface;
 
 class SambaIndexingJob extends BaseObject implements JobInterface {
+    /**
+     * @var array $file
+     */
     public array $file;
 
     /**
      * @param $queue
      *
      * @return void
+     * @throws \yii\db\Exception
+     * @throws StaleObjectException
+     * @throws Exception
      */
     public function execute($queue) {
         $file = $this->file;
 
-        if (empty(Document::findOne(['path' => $file['path']]))) {
-//            $content = '';
-//            if (in_array($file['mime_type'], FileConverter::AVAILABLE_MIME_TYPES)) {
-//                $fileName = Yii::getAlias('@runtime/' . $file['name']);
-//                file_put_contents($fileName, base64_decode($file['content']));
-//
-//                $converter = new FileConverter($fileName);
-//                $content   = $converter->convert($file['mime_type']);
-//                @unlink($fileName);
-//            }
+        $document = Document::findOne(['path' => $file['path']]);
+        if (empty($document)) {
+            $content = $this->getFileContent($file);
 
             $fields = [
                 'type'       => 'samba',
                 'name'       => $file['name'],
-                'content'    => $file['content'],
+                'content'    => $content,
                 'created'    => $file['ctime'],
                 'mime_type'  => $file['mime_type'],
                 'media_type' => $file['mime_type'],
@@ -44,22 +45,21 @@ class SambaIndexingJob extends BaseObject implements JobInterface {
             $document = new Document($fields);
             $document->insert(true, array_keys($fields), ['pipeline' => 'attachment']);
         } else {
-            $document = Document::findOne(['path' => $file['path']]);
-
             if ($document->md5 !== $file['hash']) {
-                $content = '';
-                if (in_array($file['mime_type'], FileConverter::AVAILABLE_MIME_TYPES)) {
-                    $fileName = Yii::getAlias('@runtime/tempFile.data');
-                    file_put_contents($fileName, $file['content']);
-
-                    $converter = new FileConverter($fileName);
-                    $content   = $converter->convert($file['mime_type']);
-                    @unlink($fileName);
-                }
-
-                $document->content = $content;
-                $document->save();
+                $document->content = $this->getFileContent($file);
+                $document->update(true, ['content'], ['pipeline' => 'attachment']);
             }
         }
+    }
+
+    /**
+     * @param array $file
+     *
+     * @return string
+     */
+    protected function getFileContent(array $file): string {
+        $converter = new FileConverter(['file' => $file]);
+
+        return $converter->convert($file['mime_type']);
     }
 }
