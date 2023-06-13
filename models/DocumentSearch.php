@@ -42,7 +42,7 @@ class DocumentSearch extends Document
                         'name^2',
                         'attachment.content',
                     ],
-                    'query' => $this->content,
+                    'query' => sprintf('*%s*', $this->content),
                     'default_operator' => 'or',
                     'analyze_wildcard' => true,
                     'minimum_should_match' => '-35%',
