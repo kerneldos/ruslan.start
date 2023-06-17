@@ -64,7 +64,16 @@ class DocumentSearch extends Document
         if (!empty($this->tags)) {
             foreach ($this->tags as $tag) {
                 $should[] = [
-                    'match' => ['attachment.content' => $tag],
+                    'simple_query_string' => [
+                        'fields' => [
+                            'name^2',
+                            'attachment.content',
+                        ],
+                        'query' => sprintf('*%s*', $tag),
+                        'default_operator' => 'or',
+                        'analyze_wildcard' => true,
+                        'minimum_should_match' => '-35%',
+                    ],
                 ];
             }
         }
