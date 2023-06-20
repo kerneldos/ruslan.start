@@ -77,7 +77,7 @@ class FileConverter extends BaseObject
             case 'image/jpeg':
             case 'image/png':
             case 'image/bmp':
-                break;
+                return '';
 
             default:
                 return $this->file['content'];
