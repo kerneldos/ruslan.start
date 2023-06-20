@@ -37,7 +37,7 @@ class SambaFileJob extends BaseObject implements JobInterface {
                         'mime_type' => $mimeType,
                     ]);
                 } catch (\Throwable $exception) {
-                    file_put_contents(Yii::getAlias('@runtime/logs/scan.log'), print_r($exception->getTraceAsString(), true), FILE_APPEND);
+                    file_put_contents(Yii::getAlias('@runtime/logs/scan.log'), print_r($exception->getMessage(), true), FILE_APPEND);
                 }
             }
 
