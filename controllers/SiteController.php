@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\components\jobs\IndexingJob;
+use app\components\jobs\SambaIndexingJob;
 use app\models\Config;
 use app\models\Document;
 use app\models\DocumentSearch;
@@ -355,6 +356,23 @@ class SiteController extends Controller
             $file = new Document($document);
             $file->insert(true, array_keys($document), ['pipeline' => 'attachment']);
         }
+
+        return $this->redirect('index');
+    }
+
+    /**
+     * @return Response
+     */
+    public function actionSambaIndexing(): Response {
+        $sambaUser = Config::find()->where(['name' => 'samba_user'])->select(['value'])->scalar();
+        $sambaPassword = Config::find()->where(['name' => 'samba_password'])->select(['value'])->scalar();
+
+//        try {
+//            echo '<pre>' . print_r(scandir(sprintf('smb://%s:%s@%s%s', $sambaUser, $sambaPassword, '10.8.0.6', '')), true) . '</pre>';die('pre');
+//        } catch (\Throwable $exception) {
+//            echo '<pre>' . print_r($exception->getMessage(), true) . '</pre>';die('pre');
+//        }
+        Yii::$app->queue->push(new SambaIndexingJob(['user' => $sambaUser, 'password' => $sambaPassword]));
 
         return $this->redirect('index');
     }

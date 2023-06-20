@@ -70,6 +70,7 @@ class Document extends ActiveRecord
      */
     public static function settings(): array {
         return [
+            'default_pipeline' => 'attachment',
             'analysis' => [
                 'filter' => [
                     'ru_stop' => [

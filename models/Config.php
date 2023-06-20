@@ -11,9 +11,20 @@ use Yii;
  * @property string|null $title
  * @property string $name
  * @property string|null $value
+ * @property string $type
  */
 class Config extends \yii\db\ActiveRecord
 {
+    const TYPE_TEXT = 'text';
+    const TYPE_TEXTAREA = 'textarea';
+    const TYPE_PASSWORD = 'password';
+
+    const TYPES_MAP = [
+        self::TYPE_TEXT => 'Text',
+        self::TYPE_TEXTAREA => 'Text Area',
+        self::TYPE_PASSWORD => 'Password',
+    ];
+
     /**
      * {@inheritdoc}
      */
@@ -29,8 +40,9 @@ class Config extends \yii\db\ActiveRecord
     {
         return [
             [['name'], 'required'],
-            [['value'], 'string'],
+            [['value', 'type'], 'string'],
             [['title', 'name'], 'string', 'max' => 150],
+            ['type', 'in', 'range' => array_keys(self::TYPES_MAP)],
         ];
     }
 

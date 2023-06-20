@@ -8,6 +8,7 @@
 
 use app\models\Tag;
 use yii\base\Model;
+use yii\helpers\Html;
 use yii\widgets\ListView;
 
 $this->title = 'Search Project';
@@ -15,6 +16,20 @@ $this->title = 'Search Project';
 <div class="site-index">
     <section class="content">
         <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <?= Html::a('Пересоздать индекс', ['/site/recreate-index'], [
+                                'class' => 'btn btn-primary',
+                            ]) ?>
+                            <?= Html::a('Проиндексировать ПК', ['/site/samba-indexing'], [
+                                'class' => 'btn btn-primary',
+                            ]) ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="row flex-nowrap">
                 <div class="col-lg-10">
                     <div class="card">

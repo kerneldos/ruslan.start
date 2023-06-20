@@ -1,7 +1,9 @@
 <?php
 
+use yii\helpers\ArrayHelper;
+
 $params = require __DIR__ . '/params.php';
-$db = require __DIR__ . '/db.php';
+$db     = require __DIR__ . '/db.php';
 
 $config = [
     'id' => 'basic-console',
@@ -51,6 +53,12 @@ if (YII_ENV_DEV) {
         // uncomment the following to add your IP if you are not connecting from localhost.
         //'allowedIPs' => ['127.0.0.1', '::1'],
     ];
+}
+
+// Local environment settings
+$localConfig = __DIR__ . '/config.local.php';
+if (is_file($localConfig)) {
+    $config = ArrayHelper::merge($config, require $localConfig);
 }
 
 return $config;

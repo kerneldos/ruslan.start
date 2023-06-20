@@ -29,7 +29,16 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'title',
             'name',
-            'value:ntext',
+            [
+                'attribute' => 'value',
+                'value' => function(Config $model) {
+                    if ($model->type == $model::TYPE_PASSWORD) {
+                        return '********';
+                    }
+
+                    return $model->value;
+                },
+            ],
             [
                 'class' => ActionColumn::className(),
                 'urlCreator' => function ($action, Config $model, $key, $index, $column) {
