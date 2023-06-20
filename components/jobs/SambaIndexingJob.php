@@ -56,7 +56,7 @@ class SambaIndexingJob extends BaseObject implements JobInterface {
                         $fields = [
                             'type'       => 'samba',
                             'name'       => $file,
-                            'created'    => $fileInfo['ctime'],
+                            'ctime'      => $fileInfo['ctime'],
                             'mime_type'  => $mimeType,
                             'media_type' => $mimeType,
                             'path'       => $fullPath,
