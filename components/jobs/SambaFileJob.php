@@ -32,6 +32,7 @@ class SambaFileJob extends BaseObject implements JobInterface {
             if ($file['size'] < 20 * 1024 * 1024) {
                 try {
                     $content = $this->getFileContent([
+                        'name' => md5($file['name']),
                         'content' => base64_encode(file_get_contents($fullPath)),
                         'mime_type' => $mimeType,
                     ]);
