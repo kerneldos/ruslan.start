@@ -60,6 +60,7 @@ class SambaIndexingJob extends BaseObject implements JobInterface {
                             'mime_type'  => $mimeType,
                             'media_type' => $mimeType,
                             'path'       => $fullPath,
+                            'size'       => $fileInfo['size'],
                         ];
 
                         Yii::$app->queue->push(new SambaFileJob([
