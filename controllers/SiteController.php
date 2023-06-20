@@ -221,17 +221,10 @@ class SiteController extends Controller
 
             $content = file_get_contents($response->data['href']);
         } else {
-            $client = new Client(['baseUrl' => 'http://10.8.0.6/api/']);
-            $response = $client->createRequest()
-                ->setUrl('samba-download')
-                ->setMethod('GET')
-                ->setData(['path' => $path])
-                ->send();
-
-            $content = $response->getContent();
+            $content = file_get_contents($path);
         }
 
-        if ($response->isOk) {
+        if (!empty($content)) {
             return Yii::$app->response->sendContentAsFile($content, $name);
         }
 
