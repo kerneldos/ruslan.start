@@ -62,6 +62,7 @@ class FileConverter extends BaseObject
         $content = file_get_contents($outFileName . '.txt');
 
         unlink(\Yii::getAlias($outFileName . '.txt'));
+        unlink($inputFileName);
 
         return base64_encode($content);
     }
@@ -76,7 +77,7 @@ class FileConverter extends BaseObject
             case 'image/jpeg':
             case 'image/png':
             case 'image/bmp':
-                return $this->convertImages();
+                break;
 
             default:
                 return $this->file['content'];
