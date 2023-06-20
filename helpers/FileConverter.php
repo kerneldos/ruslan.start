@@ -59,9 +59,9 @@ class FileConverter extends BaseObject
         $outFileName = Yii::getAlias('@runtime/out' . $this->file['name']);
         exec('tesseract ' . $inputFileName . ' ' . $outFileName . ' -l rus+eng');
 
-        $content = file_get_contents(Yii::getAlias('@runtime/out.txt'));
+        $content = file_get_contents($outFileName . '.txt');
 
-        unlink(\Yii::getAlias('@runtime/out.txt'));
+        unlink(\Yii::getAlias($outFileName . '.txt'));
 
         return base64_encode($content);
     }
