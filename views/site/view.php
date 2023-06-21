@@ -36,7 +36,7 @@ YiiAsset::register($this);
                 'attribute' => 'content',
                 'format' => 'raw',
                 'value' => function(Document $model) {
-                    return $model->attachment['content'];
+                    return $model->attachment['content'] ?? null;
                 },
             ],
         ],

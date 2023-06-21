@@ -9,10 +9,7 @@ use yii\base\BaseObject;
 use yii\queue\JobInterface;
 
 class SambaFileJob extends BaseObject implements JobInterface {
-    public string $host = '10.8.0.6';
-    public string $user;
-    public string $password;
-    public array $file;
+    public Document $document;
 
     /**
      * @param $queue
@@ -20,61 +17,32 @@ class SambaFileJob extends BaseObject implements JobInterface {
      * @return void
      */
     public function execute($queue) {
-        $file = $this->file;
+        $content = '';
 
-        $fullPath = $file['path'];
-
-        $document = Document::findOne(['path' => $fullPath]);
-        if (empty($document)) {
-            $mimeType = $file['mime_type'];
-
-            $content = '';
-            if ($file['size'] < 20 * 1024 * 1024) {
-                try {
-                    $content = $this->getFileContent([
-                        'name' => md5($file['name']),
-                        'content' => base64_encode(file_get_contents($fullPath)),
-                        'mime_type' => $mimeType,
-                    ]);
-                } catch (\Throwable $exception) {
-                    file_put_contents(Yii::getAlias('@runtime/logs/scan.log'), print_r($exception->getMessage(), true), FILE_APPEND);
-                }
-            }
-
-            $fields = [
-                'type'       => 'samba',
-                'name'       => $file['name'],
-                'content'    => $content,
-                'created'    => $file['ctime'],
-                'mime_type'  => $file['mime_type'],
-                'media_type' => $file['mime_type'],
-                'path'       => $fullPath,
-                'sha256'     => md5($content),
-                'md5'        => md5($content),
-            ];
-
+        if ($this->document->size < 20 * 1024 * 1024) {
             try {
-                $document = new Document($fields);
-                $document->save();
+//                    $content = $this->getFileContent([
+//                        'name' => md5($document->name),
+//                        'content' => base64_encode(file_get_contents($fullPath)),
+//                        'mime_type' => $mimeType,
+//                    ]);
+                $converter = new FileConverter(['document' => $this->document]);
+
+                $content = $converter->convert();
             } catch (\Throwable $exception) {
-                file_put_contents(Yii::getAlias('@runtime/logs/insert.log'), print_r($exception->getMessage(), true), FILE_APPEND);
+                file_put_contents(Yii::getAlias('@runtime/logs/scan.log'), print_r($exception->getMessage(), true), FILE_APPEND);
             }
-        } else {
-//                        if ($document->md5 !== $file['hash']) {
-//                            $document->content = $this->getFileContent($file);
-//                            $document->update(true, ['content'], ['pipeline' => 'attachment']);
-//                        }
         }
-    }
 
-    /**
-     * @param array $file
-     *
-     * @return string
-     */
-    protected function getFileContent(array $file): string {
-        $converter = new FileConverter(['file' => $file]);
+        try {
+            $hash = md5($content);
 
-        return $converter->convert($file['mime_type']);
+            $this->document->content = $content;
+            $this->document->sha256  = $hash;
+            $this->document->md5     = $hash;
+            $this->document->save();
+        } catch (\Throwable $exception) {
+            file_put_contents(Yii::getAlias('@runtime/logs/insert.log'), print_r($exception->getMessage(), true), FILE_APPEND);
+        }
     }
 }

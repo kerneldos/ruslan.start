@@ -29,7 +29,10 @@ class DocumentSearch extends Document
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' => ['pageSize' => 10,]
+            'pagination' => ['pageSize' => 10],
+            'sort' => [
+                'attributes' => ['name', 'created'],
+            ],
         ]);
 
         $this->load($params);

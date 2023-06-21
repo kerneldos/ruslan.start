@@ -2,9 +2,9 @@
 
 namespace app\helpers;
 
+use app\models\Document;
 use Yii;
 use yii\base\BaseObject;
-use ZipArchive;
 
 class FileConverter extends BaseObject
 {
@@ -35,7 +35,7 @@ class FileConverter extends BaseObject
         'image/bmp',
     ];
 
-    public array $file;
+    public Document $document;
 
     /**
      * @param string $content
@@ -53,35 +53,37 @@ class FileConverter extends BaseObject
      * @return string
      */
     public function convertImages(): string {
-        $inputFileName = Yii::getAlias('@runtime/' . $this->file['name']);
-        file_put_contents($inputFileName, base64_decode($this->file['content']));
-
-        $outFileName = Yii::getAlias('@runtime/out' . $this->file['name']);
-        exec('tesseract ' . $inputFileName . ' ' . $outFileName . ' -l rus+eng');
-
-        $content = file_get_contents($outFileName . '.txt');
-
-        unlink(\Yii::getAlias($outFileName . '.txt'));
-        unlink($inputFileName);
-
-        return base64_encode($content);
+        return '';
+//        $inputFileName = Yii::getAlias('@runtime/' . $this->file['name']);
+//        file_put_contents($inputFileName, base64_decode($this->file['content']));
+//
+//        $outFileName = Yii::getAlias('@runtime/out' . $this->file['name']);
+//        exec('tesseract ' . $inputFileName . ' ' . $outFileName . ' -l rus+eng');
+//
+//        $content = file_get_contents($outFileName . '.txt');
+//
+//        unlink(\Yii::getAlias($outFileName . '.txt'));
+//        unlink($inputFileName);
+//
+//        return base64_encode($content);
     }
 
     /**
-     * @param string $mimeType
-     *
-     * @return mixed|string
+     * @return string
      */
-    public function convert(string $mimeType = '') {
-        switch ($mimeType) {
+    public function convert(): string {
+        switch ($this->document->mime_type) {
             case 'image/jpeg':
             case 'image/png':
             case 'image/bmp':
-                return '';
+                $content = $this->convertImages();
+                break;
 
             default:
-                return $this->file['content'];
+                $content = file_get_contents($this->document->path);
         }
+
+        return base64_encode($content);
     }
 }
 

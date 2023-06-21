@@ -30,6 +30,7 @@ class AppAsset extends AssetBundle
         'dist/css/adminlte.min.css',
         'plugins/overlayScrollbars/css/OverlayScrollbars.min.css',
         'plugins/summernote/summernote-bs4.min.css',
+        'css/site.css',
     ];
     public $js = [
 //        'plugins/jquery/jquery.min.js',

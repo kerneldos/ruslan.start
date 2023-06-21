@@ -19,6 +19,7 @@ use yii\elasticsearch\Exception;
  * @property string $sha256
  * @property string $md5
  * @property array $attachment
+ * @property int $size
  */
 class Document extends ActiveRecord
 {
@@ -26,7 +27,7 @@ class Document extends ActiveRecord
      * @return string[]
      */
     public function attributes(): array {
-        return ['name', 'content', 'created', 'mime_type', 'file', 'media_type', 'path', 'sha256', 'md5', 'type', 'attachment'];
+        return ['name', 'content', 'created', 'mime_type', 'file', 'media_type', 'path', 'sha256', 'md5', 'type', 'attachment', 'size'];
     }
 
     /**
@@ -47,6 +48,7 @@ class Document extends ActiveRecord
                 'sha256'     => ['type' => 'text'],
                 'md5'        => ['type' => 'text'],
                 'attachment' => ['type' => 'object'],
+                'size'       => ['type' => 'unsigned_long'],
             ]
         ];
     }
@@ -70,6 +72,7 @@ class Document extends ActiveRecord
      */
     public static function settings(): array {
         return [
+            'number_of_replicas' => 0,
             'default_pipeline' => 'attachment',
             'analysis' => [
                 'filter' => [

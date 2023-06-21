@@ -246,14 +246,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 
         <!-- Main content -->
         <section class="content">
-            <div class="container-fluid">
-                <!-- Main row -->
-                <div class="row">
-                    <section class="content col-sm-12">
-                        <?= $content ?>
-                </div>
-                <!-- /.row (main row) -->
-            </div><!-- /.container-fluid -->
+            <?= $content ?>
         </section>
         <!-- /.content -->
     </div>

@@ -9,6 +9,7 @@ use app\models\Document;
 use app\models\DocumentSearch;
 use app\models\Tag;
 use yii\base\InvalidConfigException;
+use yii\data\Sort;
 use yii\httpclient\Client;
 use Yii;
 use yii\httpclient\Exception;
@@ -71,6 +72,10 @@ class SiteController extends Controller
      * @return string
      */
     public function actionIndex(): string {
+        $sort = new Sort([
+            'attributes' => ['name', 'created'],
+        ]);
+
         $searchModel = new DocumentSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
@@ -80,6 +85,7 @@ class SiteController extends Controller
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'tags' => $tags,
+            'sort' => $sort,
         ]);
     }
 
