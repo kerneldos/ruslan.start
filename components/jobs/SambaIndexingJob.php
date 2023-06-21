@@ -118,18 +118,22 @@ class SambaIndexingJob extends BaseObject implements JobInterface {
      */
     protected function extractZip(string $filePath): void {
         try {
-            $fileName = Yii::getAlias('@runtime/' . basename($filePath) . '.zip');
+            $fileInfo = stat($filePath);
 
-            if (copy($filePath, $fileName)) {
-                $zip = new ZipArchive;
+            if ($fileInfo['size'] < 20 * 1024 * 1024) {
+                $fileName = Yii::getAlias('@runtime/' . basename($filePath) . '.zip');
 
-                if ($zip->open($fileName) === true) {
-                    $dir = Yii::getAlias('@runtime/' . basename($filePath));
+                if (copy($filePath, $fileName)) {
+                    $zip = new ZipArchive;
 
-                    $zip->extractTo($dir);
-                    $zip->close();
+                    if ($zip->open($fileName) === true) {
+                        $dir = Yii::getAlias('@runtime/' . basename($filePath));
 
-                    $this->scanDir($dir);
+                        $zip->extractTo($dir);
+                        $zip->close();
+
+                        $this->scanDir($dir);
+                    }
                 }
             }
         } catch (\Throwable $exception) {
