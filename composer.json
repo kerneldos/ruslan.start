@@ -25,7 +25,8 @@
         "ext-fileinfo": "*",
         "enqueue/amqp-lib": "^0.10.18",
         "yiisoft/yii2-queue": "^2.3",
-        "ext-curl": "*"
+        "ext-curl": "*",
+        "thiagoalessio/tesseract_ocr": "^2.12"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

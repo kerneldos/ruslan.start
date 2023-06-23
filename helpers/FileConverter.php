@@ -3,6 +3,7 @@
 namespace app\helpers;
 
 use app\models\Document;
+use thiagoalessio\TesseractOCR\TesseractOCR;
 use Yii;
 use yii\base\BaseObject;
 
@@ -53,18 +54,22 @@ class FileConverter extends BaseObject
      * @return string
      */
     public function convertImages(): string {
-        $inputFileName = Yii::getAlias('@runtime/' . $this->document->md5);
-        file_put_contents($inputFileName, file_get_contents($this->document->path));
+//        $inputFileName = Yii::getAlias('@runtime/' . $this->document->md5);
+//        file_put_contents($inputFileName, file_get_contents($this->document->path));
+//
+//        $outFileName = Yii::getAlias('@runtime/out' . $this->document->md5);
+//        exec('tesseract ' . $inputFileName . ' ' . $outFileName . ' -l rus+eng');
+//
+//        $content = file_get_contents($outFileName . '.txt');
+//
+//        unlink(\Yii::getAlias($outFileName . '.txt'));
+//        unlink($inputFileName);
 
-        $outFileName = Yii::getAlias('@runtime/out' . $this->document->md5);
-        exec('tesseract ' . $inputFileName . ' ' . $outFileName . ' -l rus+eng');
-
-        $content = file_get_contents($outFileName . '.txt');
-
-        unlink(\Yii::getAlias($outFileName . '.txt'));
-        unlink($inputFileName);
-
-        return $content;
+        try {
+            return (new TesseractOCR($this->document->path))->lang('rus', 'eng')->run();
+        } catch (\Throwable $exception) {
+            return '';
+        }
     }
 
     /**
