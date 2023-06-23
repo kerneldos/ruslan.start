@@ -54,22 +54,21 @@ class FileConverter extends BaseObject
      * @return string
      */
     public function convertImages(): string {
-//        $inputFileName = Yii::getAlias('@runtime/' . $this->document->md5);
-//        file_put_contents($inputFileName, file_get_contents($this->document->path));
-//
-//        $outFileName = Yii::getAlias('@runtime/out' . $this->document->md5);
-//        exec('tesseract ' . $inputFileName . ' ' . $outFileName . ' -l rus+eng');
-//
-//        $content = file_get_contents($outFileName . '.txt');
-//
-//        unlink(\Yii::getAlias($outFileName . '.txt'));
-//        unlink($inputFileName);
-
         try {
-            return (new TesseractOCR($this->document->path))->lang('rus', 'eng')->run();
+            $fileName = Yii::getAlias('@runtime/' . $this->document->md5);
+
+            if (copy($this->document->path, $fileName)) {
+                $content = (new TesseractOCR($fileName))->lang('rus', 'eng')->run();
+
+                unlink($fileName);
+
+                return $content;
+            }
         } catch (\Throwable $exception) {
             return '';
         }
+
+        return '';
     }
 
     /**
