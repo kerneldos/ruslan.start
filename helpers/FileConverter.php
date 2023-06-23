@@ -53,19 +53,18 @@ class FileConverter extends BaseObject
      * @return string
      */
     public function convertImages(): string {
-        return '';
-//        $inputFileName = Yii::getAlias('@runtime/' . $this->file['name']);
-//        file_put_contents($inputFileName, base64_decode($this->file['content']));
-//
-//        $outFileName = Yii::getAlias('@runtime/out' . $this->file['name']);
-//        exec('tesseract ' . $inputFileName . ' ' . $outFileName . ' -l rus+eng');
-//
-//        $content = file_get_contents($outFileName . '.txt');
-//
-//        unlink(\Yii::getAlias($outFileName . '.txt'));
-//        unlink($inputFileName);
-//
-//        return base64_encode($content);
+        $inputFileName = Yii::getAlias('@runtime/' . $this->document->md5);
+        file_put_contents($inputFileName, file_get_contents($this->document->path));
+
+        $outFileName = Yii::getAlias('@runtime/out' . $this->document->md5);
+        exec('tesseract ' . $inputFileName . ' ' . $outFileName . ' -l rus+eng');
+
+        $content = file_get_contents($outFileName . '.txt');
+
+        unlink(\Yii::getAlias($outFileName . '.txt'));
+        unlink($inputFileName);
+
+        return $content;
     }
 
     /**

@@ -48,33 +48,7 @@ class SambaIndexingJob extends BaseObject implements JobInterface {
                 if (is_dir($fullPath)) {
                     $this->scanRemote($path);
                 } else {
-                    $fileInfo = stat($fullPath);
-                    $mimeType = mime_content_type($fullPath);
-
-                    $document = Document::findOne(['path' => $fullPath]);
-
-                    if (!$this->isArchive($mimeType)) {
-                        if (empty($document)) {
-                            $document = new Document([
-                                'type'       => 'samba',
-                                'name'       => $file,
-                                'created'    => $fileInfo['ctime'],
-                                'mime_type'  => $mimeType,
-                                'media_type' => $mimeType,
-                                'path'       => $fullPath,
-                                'size'       => $fileInfo['size'],
-                            ]);
-
-                            Yii::$app->queue->push(new SambaFileJob(['document' => $document]));
-                        } else {
-//                            if ($document->md5 !== $file['hash']) {
-//                                $document->content = $this->getFileContent($file);
-//                                $document->update(true, ['content'], ['pipeline' => 'attachment']);
-//                            }
-                        }
-                    } else {
-                        $this->extractArchive($fullPath, $mimeType);
-                    }
+                    $this->processFile($fullPath, $file);
                 }
             }
         }
@@ -164,33 +138,47 @@ class SambaIndexingJob extends BaseObject implements JobInterface {
             if (is_dir($fullPath)) {
                 $this->scanDir($fullPath);
             } else {
-                $fileInfo = stat($fullPath);
-                $mimeType = mime_content_type($fullPath);
+                $this->processFile($fullPath, $file);
+            }
+        }
+    }
 
-                $document = Document::findOne(['path' => $fullPath]);
+    /**
+     * @param string $fullPath
+     * @param        $file
+     *
+     * @return void
+     */
+    protected function processFile(string $fullPath, $file): void {
+        $fileInfo = stat($fullPath);
+        $mimeType = mime_content_type($fullPath);
+        $hash     = md5(join('', [$fileInfo['ctime'], $fileInfo['size']]));
 
-                if (!$this->isArchive($mimeType)) {
-                    if (empty($document)) {
-                        $document = new Document([
-                            'type'       => 'samba',
-                            'name'       => $file,
-                            'created'    => $fileInfo['ctime'],
-                            'mime_type'  => $mimeType,
-                            'media_type' => $mimeType,
-                            'path'       => $fullPath,
-                            'size'       => $fileInfo['size'],
-                        ]);
+        $document = Document::findOne(['path' => $fullPath]);
+        $needIndex = empty($document) || $document->md5 !== $hash;
 
-                        Yii::$app->queue->push(new SambaFileJob(['document' => $document]));
-                    } else {
-                        //                            if ($document->md5 !== $file['hash']) {
-                        //                                $document->content = $this->getFileContent($file);
-                        //                                $document->update(true, ['content'], ['pipeline' => 'attachment']);
-                        //                            }
-                    }
-                } else {
-                    $this->extractArchive($fullPath, $mimeType);
-                }
+        if (empty($document)) {
+            $document = new Document([
+                'type' => 'samba',
+                'name' => $file,
+                'created' => $fileInfo['ctime'],
+                'mime_type' => $mimeType,
+                'media_type' => $mimeType,
+                'path' => $fullPath,
+                'size' => $fileInfo['size'],
+                'sha256' => $hash,
+                'md5' => $hash,
+            ]);
+        }
+
+        if ($needIndex) {
+            if (!$this->isArchive($mimeType)) {
+                Yii::$app->queue->push(new SambaFileJob(['document' => $document]));
+            } else {
+                $document->content = '';
+                $document->save();
+
+                $this->extractArchive($fullPath, $mimeType);
             }
         }
     }
