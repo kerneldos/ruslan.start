@@ -3,6 +3,7 @@
 namespace app\components\jobs;
 
 use app\models\Document;
+use RarArchive;
 use Yii;
 use yii\base\BaseObject;
 use yii\db\StaleObjectException;
@@ -15,6 +16,8 @@ class SambaIndexingJob extends BaseObject implements JobInterface {
     public string $user;
     public string $password;
 
+    public string $tempDir;
+
     /**
      * @param $queue
      *
@@ -24,6 +27,8 @@ class SambaIndexingJob extends BaseObject implements JobInterface {
      * @throws Exception
      */
     public function execute($queue) {
+        $this->tempDir = Yii::getAlias('@runtime/temp/');
+
         $this->scanRemote();
     }
 
@@ -95,13 +100,13 @@ class SambaIndexingJob extends BaseObject implements JobInterface {
             $fileInfo = stat($filePath);
 
             if ($fileInfo['size'] < 20 * 1024 * 1024) {
-                $fileName = Yii::getAlias('@runtime/' . basename($filePath) . '.zip');
+                $fileName = $this->tempDir . basename($filePath);
 
                 if (copy($filePath, $fileName)) {
                     $zip = new ZipArchive;
 
                     if ($zip->open($fileName) === true) {
-                        $dir = Yii::getAlias('@runtime/' . basename($filePath));
+                        $dir = $this->tempDir . basename($filePath) . '_dir';
 
                         $zip->extractTo($dir);
                         $zip->close();
@@ -121,7 +126,30 @@ class SambaIndexingJob extends BaseObject implements JobInterface {
      * @return void
      */
     protected function extractRar(string $filePath): void {
+        try {
+            $fileInfo = stat($filePath);
 
+            if ($fileInfo['size'] < 20 * 1024 * 1024) {
+                $fileName = $this->tempDir . basename($filePath);
+
+                if (copy($filePath, $fileName)) {
+                    if (($rar = RarArchive::open($fileName)) !== false) {
+                        $dir = $this->tempDir . basename($filePath) . '_dir';
+
+                        $entries = $rar->getEntries() ?? [];
+                        foreach ($entries as $entry) {
+                            $entry->extract($dir);
+                        }
+
+                        $rar->close();
+
+                        $this->scanDir($dir);
+                    }
+                }
+            }
+        } catch (\Throwable $exception) {
+            Yii::error($exception->getMessage());
+        }
     }
 
     /**

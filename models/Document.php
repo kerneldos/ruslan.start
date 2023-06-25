@@ -47,8 +47,13 @@ class Document extends ActiveRecord
                 'type'       => ['type' => 'keyword'],
                 'sha256'     => ['type' => 'text'],
                 'md5'        => ['type' => 'text'],
-                'attachment' => ['type' => 'object'],
                 'size'       => ['type' => 'unsigned_long'],
+                'attachment' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'content' => ['type' => 'text', 'fielddata' => 'true'],
+                    ],
+                ],
             ]
         ];
     }
