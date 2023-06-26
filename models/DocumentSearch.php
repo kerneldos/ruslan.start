@@ -95,8 +95,7 @@ class DocumentSearch extends Document
     /**
      * @return array the validation rules.
      */
-    public function rules()
-    {
+    public function rules(): array {
         return [
             [['name', 'content', 'created', 'mime_type', 'file', 'media_type', 'path', 'sha256', 'md5'], 'string'],
             ['tags', 'safe'],

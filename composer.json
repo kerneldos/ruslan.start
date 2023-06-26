@@ -27,7 +27,8 @@
         "yiisoft/yii2-queue": "^2.3",
         "ext-curl": "*",
         "thiagoalessio/tesseract_ocr": "^2.12",
-        "ext-rar": "*"
+        "ext-rar": "*",
+        "ext-json": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
