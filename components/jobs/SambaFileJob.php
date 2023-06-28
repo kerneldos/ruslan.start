@@ -37,31 +37,6 @@ class SambaFileJob extends BaseObject implements JobInterface {
             $this->document->sha256  = $hash;
             $this->document->md5     = $hash;
             $this->document->save();
-
-            $es = Yii::$app->elasticsearch;
-
-            $response = $es->post('documents/_termvectors', [], json_encode([
-                '_id' => $this->document->_id,
-                'fields' => ['attachment.content'],
-                'term_statistics' => true,
-                'field_statistics' => true,
-                'positions' => false,
-                'offsets' => false,
-                'filter' => [
-                    'min_term_freq' => 25,
-                    'min_doc_freq' => 1,
-                    'min_word_length' => 4
-                ]
-            ]));
-
-            foreach ($response['term_vectors']['attachment.content']['terms'] ?? [] as $term => $item) {
-                $tag = Tag::findOne(['name' => $term]);
-
-                if (empty($tag)) {
-                    $tag = new Tag(['name' => $term]);
-                    $tag->save();
-                }
-            }
         } catch (Throwable $exception) {
             file_put_contents(Yii::getAlias('@runtime/logs/insert.log'), print_r($exception->getMessage(), true), FILE_APPEND);
         }
