@@ -1,5 +1,6 @@
 <?php
 
+use app\models\Document;
 use app\models\DocumentSearch;
 use app\models\Tag;
 use yii\helpers\Html;
@@ -18,6 +19,32 @@ use yii\widgets\ActiveForm;
         'method' => 'get',
     ]); ?>
 
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group mt-1">
+                <label>Типы документов:</label>
+                <select class="select2" multiple="multiple" data-placeholder="..." style="width: 100%;" name="DocumentSearch[types][]">
+                    <?php foreach (Document::TYPE_LIST as $type): ?>
+                        <?php $selected = in_array($type, $_GET['DocumentSearch']['types'] ?? []) ? 'selected' : '' ?>
+                        <option <?= $selected ?> value="<?= $type ?>"><?= $type ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group mt-1">
+                <label>Тэги:</label>
+                <select class="select2" multiple="multiple" data-placeholder="..." style="width: 100%;" name="DocumentSearch[tags][]">
+                    <?php foreach ($tags as $tag): ?>
+                        <?php $selected = in_array($tag->name, $_GET['DocumentSearch']['tags'] ?? []) ? 'selected' : '' ?>
+                        <option <?= $selected ?> value="<?= $tag->name ?>"><?= $tag->name ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+    </div>
+
     <div class="input-group input-group-lg">
         <?= Html::activeInput('search', $model, 'content', [
             'class' => 'form-control form-control-lg',
@@ -33,16 +60,6 @@ use yii\widgets\ActiveForm;
                 <a href="/site/index" class="btn btn-default"><i class="fa fa-times"></i></a>
             </div>
         <?php endif; ?>
-    </div>
-
-    <div class="form-group mt-1">
-        <label>Тэги</label>
-        <select class="select2" multiple="multiple" data-placeholder="..." style="width: 100%;" name="DocumentSearch[tags][]">
-            <?php foreach ($tags as $tag): ?>
-                <?php $selected = in_array($tag->name, $_GET['DocumentSearch']['tags'] ?? []) ? 'selected' : '' ?>
-                <option <?= $selected ?> value="<?= $tag->name ?>"><?= $tag->name ?></option>
-            <?php endforeach; ?>
-        </select>
     </div>
 
     <div class="form-group mt-1">

@@ -36,6 +36,7 @@ class SambaFileJob extends BaseObject implements JobInterface {
             $this->document->content = $content;
             $this->document->sha256  = $hash;
             $this->document->md5     = $hash;
+            $this->document->type    = Document::getType($this->document->mime_type);
             $this->document->save();
         } catch (Throwable $exception) {
             file_put_contents(Yii::getAlias('@runtime/logs/insert.log'), print_r($exception->getMessage(), true), FILE_APPEND);

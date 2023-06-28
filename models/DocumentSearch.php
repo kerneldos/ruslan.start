@@ -4,14 +4,14 @@ namespace app\models;
 
 use stdClass;
 use yii\elasticsearch\ActiveDataProvider;
-use yii\helpers\ArrayHelper;
 
 /**
  *
  */
 class DocumentSearch extends Document
 {
-    public array $tags = [];
+    public array $tags  = [];
+    public array $types = [];
 
     /**
      * Creates data provider instance with search query applied
@@ -81,13 +81,21 @@ class DocumentSearch extends Document
             }
         }
 
-        if (!empty($should)) {
-            $query->query([
-                'bool' => [
-                    'should' => $should,
+        $filter = [];
+        if (!empty($this->types)) {
+            $filter[] = [
+                'terms' => [
+                    'type' => $this->types,
                 ],
-            ]);
+            ];
         }
+
+        $query->query([
+            'bool' => [
+                'should' => $should,
+                'filter' => $filter,
+            ],
+        ]);
 
         return $dataProvider;
     }
@@ -98,7 +106,7 @@ class DocumentSearch extends Document
     public function rules(): array {
         return [
             [['name', 'content', 'created', 'mime_type', 'file', 'media_type', 'path', 'sha256', 'md5'], 'string'],
-            ['tags', 'safe'],
+            [['tags', 'types'], 'safe'],
         ];
     }
 }
