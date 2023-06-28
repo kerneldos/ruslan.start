@@ -56,7 +56,10 @@ class FileConverter extends BaseObject
     public function convertImages(): string {
         try {
             $inputFileName = Yii::getAlias('@runtime/temp/' . $this->document->md5);
-            file_put_contents($inputFileName, file_get_contents($this->document->path));
+
+            $fp = fopen($inputFileName, 'w');
+            fwrite($fp, file_get_contents($this->document->path));
+            fclose($fp);
 
             exec('tesseract ' . $inputFileName . ' stdout -l rus+eng', $text);
 
