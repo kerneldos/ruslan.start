@@ -66,6 +66,7 @@ class Document extends ActiveRecord
         'application/vnd.openxmlformats-officedocument.presentationml.presentation' => self::TYPE_PRESENTATION,
         'application/vnd.oasis.opendocument.presentation' => self::TYPE_PRESENTATION,
         'application/vnd.oasis.opendocument.spreadsheet' => self::TYPE_SPREADSHEET,
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => self::TYPE_SPREADSHEET,
         'application/vnd.oasis.opendocument.graphics' => self::TYPE_GRAPHICS,
         'application/pdf' => self::TYPE_PDF,
         'application/rtf' => self::TYPE_TXT,

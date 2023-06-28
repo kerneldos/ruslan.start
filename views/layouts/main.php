@@ -215,10 +215,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         <div class="content-header">
             <div class="container-fluid">
                 <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1 class="m-0"><?= Html::encode($this->title) ?></h1>
-                    </div><!-- /.col -->
-                    <div class="col-sm-6">
+                    <div class="col-sm-12">
                         <?= Breadcrumbs::widget([
                             'tag' => 'ol',
                             'options' => ['class' => 'breadcrumb float-sm-right'],
@@ -226,6 +223,9 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                             'activeItemTemplate' => "<li class=\"breadcrumb-item active\">{link}</li>\n",
                             'links' => $this->params['breadcrumbs'] ?? [],
                         ]) ?>
+                    </div><!-- /.col -->
+                    <div class="col-sm-12">
+                        <h1 class="m-0"><?= Html::encode($this->title) ?></h1>
                     </div><!-- /.col -->
                 </div><!-- /.row -->
             </div><!-- /.container-fluid -->
