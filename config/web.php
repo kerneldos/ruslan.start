@@ -56,6 +56,8 @@ $config = [
                 '' => 'site/index',
                 'document/<id>' => 'site/view',
                 '<_a:login|logout>' => 'site/<_a>',
+                '<_c>' => '<_c>/index',
+                '<_c>/<_a>' => '<_c>/<_a>',
             ],
         ],
     ],

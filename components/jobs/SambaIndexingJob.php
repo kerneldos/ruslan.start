@@ -2,12 +2,11 @@
 
 namespace app\components\jobs;
 
+use app\models\Category;
 use app\models\Document;
 use RarArchive;
 use Yii;
 use yii\base\BaseObject;
-use yii\db\StaleObjectException;
-use yii\elasticsearch\Exception;
 use yii\queue\JobInterface;
 use ZipArchive;
 
@@ -18,29 +17,36 @@ class SambaIndexingJob extends BaseObject implements JobInterface {
 
     public string $tempDir;
 
+    protected int $rootCategoryId;
+
+    const CATEGORY_NAME = 'Локальные файлы';
+
     /**
      * @param $queue
      *
      * @return void
-     * @throws \yii\db\Exception
-     * @throws StaleObjectException
-     * @throws Exception
      */
     public function execute($queue) {
         $this->tempDir = Yii::getAlias('@runtime/temp/');
 
-        $this->scanRemote();
+        $rootCategory = Category::findOne(['name' => self::CATEGORY_NAME, 'parent_id' => 0]);
+        if (empty($rootCategory)) {
+            $rootCategory = new Category(['name' => self::CATEGORY_NAME]);
+            $rootCategory->save();
+        }
+
+        $this->rootCategoryId = $rootCategory->id;
+
+        $this->scanRemote('', $this->rootCategoryId);
     }
 
     /**
      * @param string $remotePath
+     * @param int    $categoryId
      *
      * @return void
-     * @throws Exception
-     * @throws StaleObjectException
-     * @throws \yii\db\Exception
      */
-    protected function scanRemote(string $remotePath = ''): void {
+    protected function scanRemote(string $remotePath = '', int $categoryId = 0): void {
         $dir = sprintf('smb://%s:%s@%s%s', $this->user, $this->password, $this->host, $remotePath);
 
         $files = array_diff(scandir($dir), ['.', '..']);
@@ -51,12 +57,31 @@ class SambaIndexingJob extends BaseObject implements JobInterface {
                 $fullPath = join(DIRECTORY_SEPARATOR, [$dir, $file]);
 
                 if (is_dir($fullPath)) {
-                    $this->scanRemote($path);
+                    $category = $this->generateCategory($categoryId, $file);
+
+                    $this->scanRemote($path, $category->id);
                 } else {
-                    $this->processFile($fullPath, $file);
+                    $this->processFile($fullPath, $file, $categoryId);
                 }
             }
         }
+    }
+
+    /**
+     * @param int    $parentId
+     * @param string $name
+     *
+     * @return Category
+     */
+    public function generateCategory(int $parentId, string $name): Category {
+        $folderCategory = Category::findOne(['name' => $name, 'parent_id' => $parentId]);
+
+        if (empty($folderCategory)) {
+            $folderCategory = new Category(['name' => $name, 'parent_id' => $parentId]);
+            $folderCategory->save();
+        }
+
+        return $folderCategory;
     }
 
     /**
@@ -166,18 +191,19 @@ class SambaIndexingJob extends BaseObject implements JobInterface {
             if (is_dir($fullPath)) {
                 $this->scanDir($fullPath);
             } else {
-                $this->processFile($fullPath, $file);
+                $this->processFile($fullPath, $file, $this->rootCategoryId);
             }
         }
     }
 
     /**
      * @param string $fullPath
-     * @param        $file
+     * @param        $fileName
+     * @param int    $categoryId
      *
      * @return void
      */
-    protected function processFile(string $fullPath, $file): void {
+    protected function processFile(string $fullPath, $fileName, int $categoryId): void {
         $fileInfo = stat($fullPath);
         $mimeType = mime_content_type($fullPath);
         $hash     = md5(join('', [$fileInfo['ctime'], $fileInfo['size']]));
@@ -188,7 +214,7 @@ class SambaIndexingJob extends BaseObject implements JobInterface {
         if (empty($document)) {
             $document = new Document([
                 'type' => 'samba',
-                'name' => $file,
+                'name' => $fileName,
                 'created' => $fileInfo['ctime'],
                 'mime_type' => $mimeType,
                 'media_type' => $mimeType,
@@ -196,6 +222,7 @@ class SambaIndexingJob extends BaseObject implements JobInterface {
                 'size' => $fileInfo['size'],
                 'sha256' => $hash,
                 'md5' => $hash,
+                'category' => $categoryId,
             ]);
         }
 

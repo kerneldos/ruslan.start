@@ -1,5 +1,6 @@
 <?php
 
+use app\models\Category;
 use app\models\Document;
 use app\models\DocumentSearch;
 use app\models\Tag;
@@ -18,6 +19,41 @@ use yii\widgets\ActiveForm;
         'action' => ['index'],
         'method' => 'get',
     ]); ?>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group mt-1">
+                <div class="tree">
+                    <label>Расположение:</label>
+                    <div class="select">
+                        <?= Html::activeHiddenInput($model, 'category') ?>
+                        <span>
+                            <?=
+                                (!empty($model->category) ? Category::find()->select('name')->where(['id' => $model->category])->scalar() : '...')
+                            ?>
+                        </span>
+                    </div>
+                    <?php
+                        function drawTree(array $tree): void {
+                            echo '<ul>';
+                                foreach ($tree as $node) {
+                                    echo '<li>';
+                                        echo '<a data-value="' . $node['id'] . '" href="#">' . $node['name'] . '</a>';
+
+                                        if (!empty($node['children'])) {
+                                            drawTree($node['children']);
+                                        }
+                                    echo '</li>';
+                                }
+                            echo '</ul>';
+                        }
+
+                        drawTree(Category::getTree());
+                    ?>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-md-6">

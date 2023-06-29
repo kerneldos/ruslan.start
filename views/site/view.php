@@ -1,5 +1,6 @@
 <?php
 
+use app\models\Category;
 use app\models\Document;
 use yii\helpers\Html;
 use yii\helpers\Url;
@@ -29,6 +30,13 @@ YiiAsset::register($this);
                         'target' => '_blank',
                         'class' => 'btn btn-default',
                     ]);
+                },
+            ],
+            [
+                'attribute' => 'category',
+                'format' => 'text',
+                'value' => function(Document $model) {
+                    return Category::find()->select('name')->where(['id' => $model->category])->scalar();
                 },
             ],
             'media_type',

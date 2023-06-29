@@ -20,6 +20,7 @@ use yii\elasticsearch\Exception;
  * @property string $md5
  * @property array $attachment
  * @property int $size
+ * @property int $category
  */
 class Document extends ActiveRecord
 {
@@ -101,7 +102,10 @@ class Document extends ActiveRecord
      * @return string[]
      */
     public function attributes(): array {
-        return ['name', 'content', 'created', 'mime_type', 'file', 'media_type', 'path', 'sha256', 'md5', 'type', 'attachment', 'size'];
+        return [
+            'name', 'content', 'created', 'mime_type', 'file', 'media_type',
+            'path', 'sha256', 'md5', 'type', 'attachment', 'size', 'category'
+        ];
     }
 
     /**
@@ -122,6 +126,7 @@ class Document extends ActiveRecord
                 'sha256'     => ['type' => 'text'],
                 'md5'        => ['type' => 'text'],
                 'size'       => ['type' => 'unsigned_long'],
+                'category'   => ['type' => 'keyword'],
                 'attachment' => [
                     'type' => 'object',
                     'properties' => [

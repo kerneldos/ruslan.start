@@ -90,6 +90,14 @@ class DocumentSearch extends Document
             ];
         }
 
+        if (!empty($this->category)) {
+            $filter[] = [
+                'term' => [
+                    'category' => $this->category,
+                ],
+            ];
+        }
+
         $query->query([
             'bool' => [
                 'should' => $should,
@@ -106,7 +114,7 @@ class DocumentSearch extends Document
     public function rules(): array {
         return [
             [['name', 'content', 'created', 'mime_type', 'file', 'media_type', 'path', 'sha256', 'md5'], 'string'],
-            [['tags', 'types'], 'safe'],
+            [['tags', 'types', 'category'], 'safe'],
         ];
     }
 }

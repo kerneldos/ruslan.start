@@ -202,6 +202,12 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                             <p>Tag</p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="/category" class="nav-link">
+                            <i class="nav-icon fas fa-th"></i>
+                            <p>Категории</p>
+                        </a>
+                    </li>
                 </ul>
             </nav>
             <!-- /.sidebar-menu -->

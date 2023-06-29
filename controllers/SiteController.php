@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\components\jobs\IndexingJob;
 use app\components\jobs\SambaIndexingJob;
+use app\models\Category;
 use app\models\Config;
 use app\models\Document;
 use app\models\DocumentSearch;
