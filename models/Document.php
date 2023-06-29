@@ -120,7 +120,7 @@ class Document extends ActiveRecord
                 'created'    => ['type' => 'date'],
                 'mime_type'  => ['type' => 'text'],
                 'file'       => ['type' => 'text'],
-                'media_type' => ['type' => 'text'],
+                'media_type' => ['type' => 'keyword'],
                 'path'       => ['type' => 'keyword'],
                 'type'       => ['type' => 'keyword'],
                 'sha256'     => ['type' => 'text'],

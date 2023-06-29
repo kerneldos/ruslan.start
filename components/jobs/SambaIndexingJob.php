@@ -217,7 +217,7 @@ class SambaIndexingJob extends BaseObject implements JobInterface {
                 'name' => $fileName,
                 'created' => $fileInfo['ctime'],
                 'mime_type' => $mimeType,
-                'media_type' => $mimeType,
+                'media_type' => Document::getType($mimeType),
                 'path' => $fullPath,
                 'size' => $fileInfo['size'],
                 'sha256' => $hash,

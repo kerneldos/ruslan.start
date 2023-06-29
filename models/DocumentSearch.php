@@ -85,7 +85,7 @@ class DocumentSearch extends Document
         if (!empty($this->types)) {
             $filter[] = [
                 'terms' => [
-                    'type' => $this->types,
+                    'media_type' => $this->types,
                 ],
             ];
         }
