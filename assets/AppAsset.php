@@ -50,7 +50,7 @@ class AppAsset extends AssetBundle
         'plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js',
         'dist/js/adminlte.js',
         'plugins/select2/js/select2.full.min.js',
-        'dist/js/pages/dashboard.js',
+//        'dist/js/pages/dashboard.js',
         'js/app.js',
     ];
 

@@ -4,14 +4,12 @@ namespace app\controllers;
 
 use app\components\jobs\IndexingJob;
 use app\components\jobs\SambaIndexingJob;
-use app\models\Category;
 use app\models\Config;
 use app\models\Document;
 use app\models\DocumentSearch;
 use app\models\Tag;
 use yii\base\InvalidConfigException;
 use yii\data\Sort;
-use yii\helpers\ArrayHelper;
 use yii\httpclient\Client;
 use Yii;
 use yii\httpclient\Exception;
@@ -106,6 +104,8 @@ class SiteController extends Controller
                 'documentsByDate' => $documentsByDate,
             ]);
         }
+
+        $this->view->registerJsFile(Yii::getAlias('@web/dist/js/pages/dashboard.js'), ['depends' => ['app\assets\AppAsset']]);
 
         return $this->render('index');
     }

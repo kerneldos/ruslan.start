@@ -53,7 +53,8 @@ $(function () {
   // The Calender
   $('#calendar').datetimepicker({
     format: 'L',
-    inline: true
+    inline: true,
+    locale: 'ru'
   })
 
   // SLIMSCROLL FOR CHAT WIDGET
