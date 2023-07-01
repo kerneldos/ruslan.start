@@ -19,6 +19,7 @@ class AppAsset extends AssetBundle
 {
     public $basePath = '@webroot';
     public $baseUrl = '@web';
+
     public $css = [
         'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback',
         'plugins/fontawesome-free/css/all.min.css',
@@ -32,6 +33,7 @@ class AppAsset extends AssetBundle
         'plugins/summernote/summernote-bs4.min.css',
         'css/site.css',
     ];
+
     public $js = [
 //        'plugins/jquery/jquery.min.js',
         'plugins/jquery-ui/jquery-ui.min.js',
@@ -47,9 +49,13 @@ class AppAsset extends AssetBundle
         'plugins/summernote/summernote-bs4.min.js',
         'plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js',
         'dist/js/adminlte.js',
-//        'dist/js/demo.js',
         'plugins/select2/js/select2.full.min.js',
         'dist/js/pages/dashboard.js',
         'js/app.js',
+    ];
+
+    public $depends = [
+        'yii\web\YiiAsset',
+//        'yii\bootstrap\BootstrapAsset',
     ];
 }

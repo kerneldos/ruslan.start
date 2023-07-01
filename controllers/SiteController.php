@@ -11,6 +11,7 @@ use app\models\DocumentSearch;
 use app\models\Tag;
 use yii\base\InvalidConfigException;
 use yii\data\Sort;
+use yii\helpers\ArrayHelper;
 use yii\httpclient\Client;
 use Yii;
 use yii\httpclient\Exception;
@@ -68,11 +69,53 @@ class SiteController extends Controller
     }
 
     /**
-     * Displays homepage.
+     * @return string|Response
+     * @throws \yii\elasticsearch\Exception
+     */
+    public function actionIndex() {
+        if (Yii::$app->request->isAjax) {
+            $searchResult = Document::find()->addAggregate('documents_by_type', [
+                'terms' => [
+                    'field' => 'media_type',
+                ],
+            ])->limit(0)->search();
+
+            $documentsByType = [
+                'labels' => array_column($searchResult['aggregations']['documents_by_type']['buckets'], 'key'),
+                'data'   => array_column($searchResult['aggregations']['documents_by_type']['buckets'], 'doc_count'),
+            ];
+
+            $searchResult = Document::find()->addAggregate('documents_by_date', [
+                'date_histogram' => [
+                    'field' => 'attachment.date',
+                    'calendar_interval' => 'month',
+                    'min_doc_count' => 1,
+                ],
+            ])->limit(0)->search();
+
+            $documentsByDate = [
+                'labels' => array_map(
+                    function($date) {return date('d.m.Y', strtotime($date));},
+                    array_column($searchResult['aggregations']['documents_by_date']['buckets'], 'key_as_string'),
+                ),
+                'data'   => array_column($searchResult['aggregations']['documents_by_date']['buckets'], 'doc_count'),
+            ];
+
+            return $this->asJson([
+                'documentsByType' => $documentsByType,
+                'documentsByDate' => $documentsByDate,
+            ]);
+        }
+
+        return $this->render('index');
+    }
+
+    /**
+     * Displays search page.
      *
      * @return string
      */
-    public function actionIndex(): string {
+    public function actionSearch(): string {
         $sort = new Sort([
             'attributes' => ['name', 'created'],
         ]);
@@ -82,7 +125,7 @@ class SiteController extends Controller
 
         $tags = Tag::find()->all();
 
-        return $this->render('index', [
+        return $this->render('search', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'tags' => $tags,

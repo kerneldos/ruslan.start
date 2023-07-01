@@ -60,4 +60,106 @@ $(function () {
   $('#chat-box').overlayScrollbars({
     height: '250px'
   })
+
+  /* Chart.js Charts */
+  $.get('/site/index', [], function (response) {
+    // docByDate chart
+    var docByDateChartCanvas = document.getElementById('doc-by-date-chart-canvas').getContext('2d')
+    // $('#revenue-chart').get(0).getContext('2d');
+
+    var docByDateChartData = {
+      labels: response.documentsByDate.labels,
+      datasets: [
+        {
+          backgroundColor: 'rgba(60,141,188,0.9)',
+          borderColor: 'rgba(60,141,188,0.8)',
+          pointRadius: false,
+          pointColor: '#3b8bba',
+          pointStrokeColor: 'rgba(60,141,188,1)',
+          pointHighlightFill: '#fff',
+          pointHighlightStroke: 'rgba(60,141,188,1)',
+          data: response.documentsByDate.data
+        }
+      ]
+    }
+
+    var docByDateChartOptions = {
+      maintainAspectRatio: false,
+      responsive: true,
+      legend: {
+        display: false
+      },
+      scales: {
+        xAxes: [{
+          gridLines: {
+            display: false
+          }
+        }],
+        yAxes: [{
+          gridLines: {
+            display: false
+          }
+        }]
+      }
+    }
+
+    // This will get the first returned node in the jQuery collection.
+    // eslint-disable-next-line no-unused-vars
+    new Chart(docByDateChartCanvas, { // lgtm[js/unused-local-variable]
+      type: 'line',
+      data: docByDateChartData,
+      options: docByDateChartOptions
+    })
+
+    // docByType chart
+    var docByTypeChartCanvas = document.getElementById('doc-by-type-chart-canvas').getContext('2d')
+    // $('#revenue-chart').get(0).getContext('2d');
+
+    var docByTypeChartData = {
+      labels: response.documentsByType.labels,
+      datasets: [
+        {
+          fill: false,
+          borderWidth: 2,
+          lineTension: 0,
+          spanGaps: true,
+          borderColor: '#000',
+          pointRadius: 3,
+          pointHoverRadius: 7,
+          pointColor: '#efefef',
+          pointBackgroundColor: '#efefef',
+          data: response.documentsByType.data
+        }
+      ]
+    }
+
+    var docByTypeChartOptions = {
+      maintainAspectRatio: false,
+      responsive: true,
+      legend: {
+        display: false
+      },
+      scales: {
+        xAxes: [{
+          gridLines: {
+            display: false
+          }
+        }],
+        yAxes: [{
+          gridLines: {
+            display: false
+          }
+        }]
+      }
+    }
+
+    // This will get the first returned node in the jQuery collection.
+    // eslint-disable-next-line no-unused-vars
+    new Chart(docByTypeChartCanvas, { // lgtm[js/unused-local-variable]
+      type: 'line',
+      data: docByTypeChartData,
+      options: docByTypeChartOptions
+    })
+  })
+
 })

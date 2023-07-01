@@ -59,7 +59,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                     <i class="fas fa-search"></i>
                 </a>
                 <div class="navbar-search-block">
-                    <form class="form-inline" action="/site/index" method="get">
+                    <form class="form-inline" action="/site/search" method="get">
                         <div class="input-group input-group-sm">
                             <input name="DocumentSearch[content]" class="form-control form-control-navbar" type="search" placeholder="Найти" aria-label="Найти">
                             <div class="input-group-append">
@@ -186,7 +186,13 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                     <li class="nav-item">
                         <a href="/" class="nav-link">
                             <i class="nav-icon fas fa-th"></i>
-                            <p>Home</p>
+                            <p>Главная</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/site/search" class="nav-link">
+                            <i class="nav-icon fas fa-th"></i>
+                            <p>Поиск</p>
                         </a>
                     </li>
                     <li class="nav-header">ADMIN</li>
