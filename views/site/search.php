@@ -26,6 +26,9 @@ $this->title = 'Search Project';
                         <?= Html::a('Проиндексировать ПК', ['/site/samba-indexing'], [
                             'class' => 'btn btn-primary',
                         ]) ?>
+                        <?= Html::a('Проиндексировать Yandex диск', ['/site/yandex-indexing'], [
+                            'class' => 'btn btn-primary',
+                        ]) ?>
                     </div>
                 </div>
             </div>

@@ -2,7 +2,7 @@
 
 namespace app\controllers;
 
-use app\components\jobs\IndexingJob;
+use app\components\jobs\YandexIndexingJob;
 use app\components\jobs\SambaIndexingJob;
 use app\models\Config;
 use app\models\Document;
@@ -37,7 +37,7 @@ class SiteController extends Controller
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['login', 'signup'],
+                        'actions' => ['login', 'signup', 'get-token'],
                         'roles' => ['?'],
                     ],
                 ],
@@ -69,6 +69,7 @@ class SiteController extends Controller
     /**
      * @return string|Response
      * @throws \yii\elasticsearch\Exception
+     * @throws InvalidConfigException
      */
     public function actionIndex() {
         if (Yii::$app->request->isAjax) {
@@ -198,10 +199,13 @@ class SiteController extends Controller
     /**
      * @return Response
      */
-    public function actionIndexing(): Response {
-        Yii::$app->queue->push(new IndexingJob());
+    public function actionYandexIndexing(): Response {
+        if ($this->isTokenExpired()) {
+            return $this->redirect('connect-api');
+        }
 
-        Yii::$app->session->setFlash('indexingIsOk');
+        Yii::$app->queue->push(new YandexIndexingJob());
+
         return $this->redirect('index');
     }
 
@@ -240,9 +244,11 @@ class SiteController extends Controller
             $configToken->save();
 
             Yii::$app->session->set('yandex_api_token', array_merge($response->data, ['token_created' => time()]));
+
+            Yii::$app->queue->push(new YandexIndexingJob());
         }
 
-        return $this->redirect('index');
+        return $this->redirect('search');
     }
 
     /**
@@ -251,8 +257,6 @@ class SiteController extends Controller
      * @param string $type
      *
      * @return Response
-     * @throws Exception
-     * @throws InvalidConfigException
      * @throws RangeNotSatisfiableHttpException
      */
     public function actionDownload(string $path, string $name, string $type): Response {
@@ -261,18 +265,16 @@ class SiteController extends Controller
                 return $this->redirect('/site/connect-api');
             }
 
-            $client = new Client(['baseUrl' => 'https://cloud-api.yandex.net/v1/']);
-            $response = $client->createRequest()
-                ->addHeaders(['Authorization' => Yii::$app->session['yandex_api_token']['access_token']])
-                ->setUrl('disk/resources/download')
-                ->setMethod('GET')
-                ->setData(['path' => $path])
-                ->send();
-
-            $content = file_get_contents($response->data['href']);
-        } else {
-            $content = file_get_contents($path);
+//            $client = new Client(['baseUrl' => 'https://cloud-api.yandex.net/v1/']);
+//            $response = $client->createRequest()
+//                ->addHeaders(['Authorization' => Yii::$app->session['yandex_api_token']['access_token']])
+//                ->setUrl('disk/resources/download')
+//                ->setMethod('GET')
+//                ->setData(['path' => $path])
+//                ->send();
         }
+
+        $content = file_get_contents($path);
 
         if (!empty($content)) {
             return Yii::$app->response->sendContentAsFile($content, $name);
@@ -410,11 +412,6 @@ class SiteController extends Controller
         $sambaUser = Config::find()->where(['name' => 'samba_user'])->select(['value'])->scalar();
         $sambaPassword = Config::find()->where(['name' => 'samba_password'])->select(['value'])->scalar();
 
-//        try {
-//            echo '<pre>' . print_r(scandir(sprintf('smb://%s:%s@%s%s', $sambaUser, $sambaPassword, '10.8.0.6', '')), true) . '</pre>';die('pre');
-//        } catch (\Throwable $exception) {
-//            echo '<pre>' . print_r($exception->getMessage(), true) . '</pre>';die('pre');
-//        }
         Yii::$app->queue->push(new SambaIndexingJob(['user' => $sambaUser, 'password' => $sambaPassword]));
 
         return $this->redirect('index');
