@@ -28,7 +28,8 @@
         "ext-curl": "*",
         "thiagoalessio/tesseract_ocr": "^2.12",
         "ext-rar": "*",
-        "ext-json": "*"
+        "ext-json": "*",
+        "yiisoft/yii2-authclient": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

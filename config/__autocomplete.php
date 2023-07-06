@@ -19,20 +19,14 @@ class Yii {
 }
 
 /**
- * @property yii\rbac\DbManager $authManager 
+ * @property yii\rbac\DbManager $authManager
  * @property \yii\web\User|__WebUser $user
- * 
+ *
+ * @property yii\queue\amqp_interop\Queue|object|null $queue
+ * @property yii\elasticsearch\Connection|object|null $elasticsearch
+ * @property yii\authclient\Collection|object|null $authClientCollection
  */
 class __Application {
-    /**
-     * @var yii\queue\amqp_interop\Queue|object|null
-     */
-    public $queue;
-
-    /**
-     * @var yii\elasticsearch\Connection|object|null
-     */
-    public $elasticsearch;
 }
 
 /**

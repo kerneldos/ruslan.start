@@ -60,6 +60,29 @@ $config = [
                 '<_c>/<_a>' => '<_c>/<_a>',
             ],
         ],
+        'authClientCollection' => [
+            'class' => 'yii\authclient\Collection',
+            'clients' => [
+                'yandex' => [
+                    'class' => 'app\components\services\Yandex',
+                    'apiBaseUrl' => 'https://cloud-api.yandex.net/v1/',
+                    'normalizeUserAttributeMap' => [
+                        'email' => function ($attributes) {
+                            return $attributes['email']
+                                ?? $attributes['default_email']
+                                ?? current($attributes['emails'] ?? [])
+                                ?: null;
+                        }
+                    ],
+                ],
+                'samba' => [
+                    'class' => 'app\components\services\Samba',
+                ],
+                'bitrix' => [
+                    'class' => 'app\components\services\Bitrix',
+                ],
+            ],
+        ],
     ],
     'params' => $params,
 ];

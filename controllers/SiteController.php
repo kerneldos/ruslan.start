@@ -2,18 +2,17 @@
 
 namespace app\controllers;
 
-use app\components\jobs\YandexIndexingJob;
-use app\components\jobs\SambaIndexingJob;
-use app\models\Config;
+use app\components\services\ServiceInterface;
 use app\models\Document;
 use app\models\DocumentSearch;
 use app\models\Tag;
+use yii\authclient\OAuth2;
 use yii\base\InvalidConfigException;
 use yii\data\Sort;
-use yii\httpclient\Client;
 use Yii;
-use yii\httpclient\Exception;
+use yii\elasticsearch\Exception;
 use yii\web\Controller;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\RangeNotSatisfiableHttpException;
 use yii\web\Response;
@@ -67,8 +66,26 @@ class SiteController extends Controller
     }
 
     /**
+     * @param string $service
+     *
+     * @return Response
+     */
+    public function actionIndexing(string $service): Response {
+        /** @var ServiceInterface|OAuth2 $client */
+        $client = Yii::$app->authClientCollection->getClient($service);
+
+        if ($client->needAuth()) {
+            return $this->redirect($client->buildAuthUrl());
+        }
+
+        $client->indexing();
+
+        return $this->redirect('index');
+    }
+
+    /**
      * @return string|Response
-     * @throws \yii\elasticsearch\Exception
+     * @throws Exception
      * @throws InvalidConfigException
      */
     public function actionIndex() {
@@ -197,56 +214,16 @@ class SiteController extends Controller
     }
 
     /**
-     * @return Response
-     */
-    public function actionYandexIndexing(): Response {
-        if ($this->isTokenExpired()) {
-            return $this->redirect('connect-api');
-        }
-
-        Yii::$app->queue->push(new YandexIndexingJob());
-
-        return $this->redirect('index');
-    }
-
-    /**
      * @param string $code
+     * @param string $service
      *
      * @return Response
-     * @throws Exception
-     * @throws InvalidConfigException
+     * @throws HttpException
      */
-    public function actionGetToken(string $code): Response {
-        $clientId = Config::findOne(['name' => 'yandex_client_id']);
-        $clientSecret = Config::findOne(['name' => 'yandex_client_secret']);
-
-        $client = new Client();
-        $response = $client->createRequest()
-            ->setMethod('POST')
-            ->setUrl('https://oauth.yandex.ru/token')
-            ->setData([
-                'grant_type' => 'authorization_code',
-                'code' => $code,
-                'client_id' => $clientId->value,
-                'client_secret' => $clientSecret->value,
-            ])
-            ->send();
-        if ($response->isOk) {
-            $configToken = Config::findOne(['name' => 'yandex_api_token']);
-            if (empty($configToken)) {
-                $configToken = new Config([
-                    'title' => 'Yandex API Token',
-                    'name'  => 'yandex_api_token',
-                ]);
-            }
-
-            $configToken->value = $response->data['access_token'];
-            $configToken->save();
-
-            Yii::$app->session->set('yandex_api_token', array_merge($response->data, ['token_created' => time()]));
-
-            Yii::$app->queue->push(new YandexIndexingJob());
-        }
+    public function actionGetToken(string $code, string $service): Response {
+        /** @var OAuth2 $client */
+        $client = Yii::$app->authClientCollection->getClient($service);
+        $client->fetchAccessToken($code);
 
         return $this->redirect('search');
     }
@@ -260,20 +237,6 @@ class SiteController extends Controller
      * @throws RangeNotSatisfiableHttpException
      */
     public function actionDownload(string $path, string $name, string $type): Response {
-        if ($type === 'yandex') {
-            if (empty(Yii::$app->session['yandex_api_token'])) {
-                return $this->redirect('/site/connect-api');
-            }
-
-//            $client = new Client(['baseUrl' => 'https://cloud-api.yandex.net/v1/']);
-//            $response = $client->createRequest()
-//                ->addHeaders(['Authorization' => Yii::$app->session['yandex_api_token']['access_token']])
-//                ->setUrl('disk/resources/download')
-//                ->setMethod('GET')
-//                ->setData(['path' => $path])
-//                ->send();
-        }
-
         $content = file_get_contents($path);
 
         if (!empty($content)) {
@@ -281,64 +244,6 @@ class SiteController extends Controller
         }
 
         return $this->redirect('index');
-    }
-
-    /**
-     * @return bool
-     */
-    protected function isTokenExpired(): bool {
-        if (empty(Yii::$app->session['yandex_api_token'])) {
-            return true;
-        }
-
-        $token = Yii::$app->session['yandex_api_token'];
-        if (time() > $token['token_created'] + $token['expires_in']) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param string $redirectUri
-     *
-     * @return string
-     * @throws NotFoundHttpException
-     */
-    protected function getAuthUrl(string $redirectUri): string {
-        $clientId = Config::findOne(['name' => 'yandex_client_id']);
-        $clientSecret = Config::findOne(['name' => 'yandex_client_secret']);
-
-        if (!empty($clientId->value) && !empty($clientSecret->value)) {
-            return sprintf('https://oauth.yandex.ru/authorize?%s', http_build_query([
-                'response_type' => 'code',
-                'client_id' => $clientId->value,
-                'redirect_uri' => $redirectUri,
-                'state' => 'yandex',
-                'force_confirm' => true,
-            ], '', '&', PHP_QUERY_RFC3986));
-        }
-
-        throw new NotFoundHttpException('Client Id or Client Secret is empty');
-    }
-
-    /**
-     * @return Response
-     * @throws NotFoundHttpException
-     */
-    public function actionConnectApi(): Response {
-        $authUrl = $this->getAuthUrl('https://45.12.74.245/site/get-token');
-
-        return $this->redirect($authUrl);
-    }
-
-    /**
-     * @return Response
-     */
-    public function actionDisconnectApi(): Response {
-        Yii::$app->session->remove('yandex_api_token');
-
-        return $this->goBack();
     }
 
     /**
@@ -357,7 +262,7 @@ class SiteController extends Controller
     /**
      * @return Response
      * @throws InvalidConfigException
-     * @throws \yii\elasticsearch\Exception
+     * @throws Exception
      */
     public function actionRecreateIndex(): Response {
         Document::deleteIndex();
@@ -401,18 +306,6 @@ class SiteController extends Controller
             $file = new Document($document);
             $file->insert(true, array_keys($document), ['pipeline' => 'attachment']);
         }
-
-        return $this->redirect('index');
-    }
-
-    /**
-     * @return Response
-     */
-    public function actionSambaIndexing(): Response {
-        $sambaUser = Config::find()->where(['name' => 'samba_user'])->select(['value'])->scalar();
-        $sambaPassword = Config::find()->where(['name' => 'samba_password'])->select(['value'])->scalar();
-
-        Yii::$app->queue->push(new SambaIndexingJob(['user' => $sambaUser, 'password' => $sambaPassword]));
 
         return $this->redirect('index');
     }

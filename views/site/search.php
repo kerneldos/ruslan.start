@@ -23,10 +23,13 @@ $this->title = 'Search Project';
                         <?= Html::a('Пересоздать индекс', ['/site/recreate-index'], [
                             'class' => 'btn btn-primary',
                         ]) ?>
-                        <?= Html::a('Проиндексировать ПК', ['/site/samba-indexing'], [
+                        <?= Html::a('Проиндексировать ПК', ['/site/indexing', 'service' => 'samba'], [
                             'class' => 'btn btn-primary',
                         ]) ?>
-                        <?= Html::a('Проиндексировать Yandex диск', ['/site/yandex-indexing'], [
+                        <?= Html::a('Проиндексировать Yandex диск', ['/site/indexing', 'service' => 'yandex'], [
+                            'class' => 'btn btn-primary',
+                        ]) ?>
+                        <?= Html::a('Проиндексировать Bitrix диск', ['/site/indexing', 'service' => 'bitrix'], [
                             'class' => 'btn btn-primary',
                         ]) ?>
                     </div>

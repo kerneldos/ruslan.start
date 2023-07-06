@@ -2,66 +2,52 @@
 
 namespace app\components\jobs;
 
+use app\components\services\Yandex;
 use app\models\Category;
-use app\models\Config;
 use app\models\Document;
 use Yii;
+use yii\authclient\OAuth2;
 use yii\base\BaseObject;
-use yii\base\InvalidConfigException;
-use yii\httpclient\Client;
 use yii\httpclient\Exception;
 use yii\queue\JobInterface;
 
 class YandexIndexingJob extends BaseObject implements JobInterface {
     protected int $rootCategoryId;
 
-    const CATEGORY_NAME = 'Yandex Диск';
-
     /**
      * @param $queue
      *
      * @return void
-     * @throws InvalidConfigException
      * @throws Exception
      */
     public function execute($queue) {
-        $rootCategory = Category::findOne(['name' => self::CATEGORY_NAME, 'parent_id' => 0]);
+        $rootCategory = Category::findOne(['name' => Yandex::CATEGORY_NAME, 'parent_id' => 0]);
         if (empty($rootCategory)) {
-            $rootCategory = new Category(['name' => self::CATEGORY_NAME]);
+            $rootCategory = new Category(['name' => Yandex::CATEGORY_NAME]);
             $rootCategory->save();
         }
 
         $this->rootCategoryId = $rootCategory->id;
 
-        $configToken = Config::findOne(['name' => 'yandex_api_token']);
+        /** @var OAuth2 $client */
+        $client = Yii::$app->authClientCollection->getClient(Yandex::SERVICE_NAME);
 
-        $client = new Client(['baseUrl' => 'https://cloud-api.yandex.net/v1/']);
-        $response = $client->createRequest()
-            ->addHeaders(['Authorization' => $configToken->value])
-            ->setMethod('GET')
-            ->setUrl('disk/resources/files')
-            ->send();
+        $response = $client->api('disk/resources/files');
+        if (!empty($response['items'])) {
+            Yii::debug($response['items']);
 
-        if ($response->isOk) {
-            Yii::debug($response->data['items']);
-
-            foreach ($response->data['items'] as $file) {
+            foreach ($response['items'] as $file) {
                 if (empty(Document::findOne(['path' => $file['path']]))) {
-                    $downloadUrlResponse = $client->createRequest()
-                        ->addHeaders(['Authorization' => $configToken->value])
-                        ->setUrl('disk/resources/download')
-                        ->setMethod('GET')
-                        ->setData(['path' => $file['path']])
-                        ->send();
+                    $downloadUrlResponse = $client->api('disk/resources/download', 'GET', ['path' => $file['path']]);
 
-                    if ($downloadUrlResponse->isOk) {
+                    if (!empty($downloadUrlResponse)) {
                         $document = new Document([
                             'name'       => $file['name'],
                             'type'       => 'yandex',
                             'created'    => $file['created'],
                             'mime_type'  => $file['mime_type'],
                             'media_type' => $file['media_type'],
-                            'path'       => $downloadUrlResponse->data['href'],
+                            'path'       => $downloadUrlResponse['href'],
                             'sha256'     => $file['sha256'],
                             'md5'        => $file['md5'],
                             'category'   => $this->rootCategoryId,
@@ -72,7 +58,7 @@ class YandexIndexingJob extends BaseObject implements JobInterface {
                 }
             }
         } else {
-            Yii::debug($response->data);
+            Yii::debug($response);
         }
     }
 }
