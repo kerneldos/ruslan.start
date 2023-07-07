@@ -72,21 +72,7 @@ class BitrixIndexingJob extends BaseObject implements JobInterface {
                 if ($child['TYPE'] == 'folder') {
                     $this->getFolderChildren(join(DIRECTORY_SEPARATOR, [$path, $child['NAME']]), $child['ID']);
                 } else {
-                    $hash = md5(join('', [$child['CREATE_TIME'], $child['SIZE']]));
-
-                    $document = new Document([
-                        'name'       => $child['NAME'],
-                        'type'       => 'bitrix',
-                        'created'    => $child['CREATE_TIME'],
-                        'mime_type'  => $child['TYPE'],
-                        'media_type' => Document::getType($child['TYPE']),
-                        'path'       => $child['DOWNLOAD_URL'] ?? $child['DETAIL_URL'],
-                        'sha256'     => $hash,
-                        'md5'        => $hash,
-                        'category'   => $this->rootCategoryId,
-                    ]);
-
-                    Yii::$app->queue->push(new SambaFileJob(['document' => $document]));
+                    $this->processFile($child);
                 }
             }
         }
@@ -99,7 +85,6 @@ class BitrixIndexingJob extends BaseObject implements JobInterface {
      */
     public function importFiles(string $path = ''): void {
         $storages = $this->getStorages();
-        file_put_contents(Yii::getAlias('@runtime/storages.log'), print_r($storages, true), FILE_APPEND);
 
         foreach ($storages as $storage) {
             $children = $this->getRootChildren($storage['ID']);
@@ -109,24 +94,40 @@ class BitrixIndexingJob extends BaseObject implements JobInterface {
                     if ($child['TYPE'] == 'folder') {
                         $this->getFolderChildren(join(DIRECTORY_SEPARATOR, [$path, $storage['NAME'], $child['NAME']]), $child['ID']);
                     } else {
-                        $hash = md5(join('', [$child['CREATE_TIME'], $child['SIZE']]));
-
-                        $document = new Document([
-                            'name'       => $child['NAME'],
-                            'type'       => 'bitrix',
-                            'created'    => $child['CREATE_TIME'],
-                            'mime_type'  => $child['TYPE'],
-                            'media_type' => Document::getType($child['TYPE']),
-                            'path'       => $child['DOWNLOAD_URL'] ?? $child['DETAIL_URL'],
-                            'sha256'     => $hash,
-                            'md5'        => $hash,
-                            'category'   => $this->rootCategoryId,
-                        ]);
-
-                        Yii::$app->queue->push(new SambaFileJob(['document' => $document]));
+                        $this->processFile($child);
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * @param array $file
+     *
+     * @return void
+     */
+    public function processFile(array $file): void {
+        $hash = md5(join('', [$file['CREATE_TIME'], $file['SIZE']]));
+
+        $document = Document::findOne(['path' => $file['DOWNLOAD_URL'] ?? $file['DETAIL_URL']]);
+        $needIndex = empty($document) || $document->md5 !== $hash;
+
+        if (empty($document)) {
+            $document = new Document([
+                'name'       => $file['NAME'],
+                'type'       => 'bitrix',
+                'created'    => $file['CREATE_TIME'],
+                'mime_type'  => $file['TYPE'],
+                'media_type' => Document::getType($file['TYPE']),
+                'path'       => $file['DOWNLOAD_URL'] ?? $file['DETAIL_URL'],
+                'sha256'     => $hash,
+                'md5'        => $hash,
+                'category'   => $this->rootCategoryId,
+            ]);
+        }
+
+        if ($needIndex) {
+            Yii::$app->queue->push(new SambaFileJob(['document' => $document]));
         }
     }
 }
