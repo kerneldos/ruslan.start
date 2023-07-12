@@ -99,6 +99,17 @@ use yii\widgets\ActiveForm;
     </div>
 
     <div class="form-group mt-1">
+        <div class="form-check">
+            <?= Html::activeInput('checkbox', $model, 'equalSearch', [
+                'class' => 'form-check-input',
+                'value' => 1,
+                'checked' => !empty($model->equalSearch)
+            ]) ?>
+            <label class="form-check-label">Точное вхождение</label>
+        </div>
+    </div>
+
+    <div class="form-group mt-1">
         <button type="submit" class="js-submit btn btn-primary">Найти</button>
     </div>
 

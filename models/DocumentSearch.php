@@ -12,6 +12,7 @@ class DocumentSearch extends Document
 {
     public array $tags  = [];
     public array $types = [];
+    public int $equalSearch = 0;
 
     /**
      * Creates data provider instance with search query applied
@@ -24,7 +25,7 @@ class DocumentSearch extends Document
         $query = Document::find()->highlight([
             'pre_tags' => ['<strong>'],  //default is <em>
             'post_tags' => ['</strong>'],
-            'fields' => ['attachment.content' => new stdClass()],
+            'fields' => ['attachment.content' => new stdClass(), 'content' => new stdClass()],
         ]);
 
         $dataProvider = new ActiveDataProvider([
@@ -46,18 +47,33 @@ class DocumentSearch extends Document
         $should = [];
 
         if (!empty($this->content)) {
-            $should[] = [
-                'simple_query_string' => [
-                    'fields' => [
-                        'name^2',
-                        'attachment.content',
+            if ($this->equalSearch) {
+                $should[] = [
+                    'simple_query_string' => [
+                        'query' => '"' . $this->content . '"',
+                        'fields' => [
+                            'name^2',
+                            'content',
+                        ],
+                        'default_operator' => 'AND',
+                        'analyze_wildcard' => false,
+//                        'analyzer' => 'standard',
                     ],
-                    'query' => sprintf('*%s*', $this->content),
-                    'default_operator' => 'or',
-                    'analyze_wildcard' => true,
-                    'minimum_should_match' => '-35%',
-                ],
-            ];
+                ];
+            } else {
+                $should[] = [
+                    'simple_query_string' => [
+                        'fields' => [
+                            'name^2',
+                            'attachment.content',
+                        ],
+                        'query' => sprintf('*%s*', $this->content),
+                        'default_operator' => 'or',
+                        'analyze_wildcard' => true,
+                        'minimum_should_match' => '-35%',
+                    ],
+                ];
+            }
 
 //            $should[] = [
 //                'match' => ['attachment.content' => $this->content],
@@ -90,13 +106,11 @@ class DocumentSearch extends Document
             ];
         }
 
-        if (!empty($this->category)) {
-            $filter[] = [
-                'term' => [
-                    'category' => $this->category,
-                ],
-            ];
-        }
+        $filter[] = [
+            'term' => [
+                'category' => $this->category ?? 0,
+            ],
+        ];
 
         $query->query([
             'bool' => [
@@ -114,7 +128,7 @@ class DocumentSearch extends Document
     public function rules(): array {
         return [
             [['name', 'content', 'created', 'mime_type', 'file', 'media_type', 'path', 'sha256', 'md5'], 'string'],
-            [['tags', 'types', 'category'], 'safe'],
+            [['tags', 'types', 'category', 'equalSearch'], 'safe'],
         ];
     }
 }

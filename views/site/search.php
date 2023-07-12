@@ -5,11 +5,14 @@
 /** @var Model $searchModel */
 /** @var bool $isConnected */
 /** @var Tag[] $tags */
+/** @var Category[] $categories */
 /** @var yii\data\Sort $sort */
 
+use app\models\Category;
 use app\models\Tag;
 use yii\base\Model;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\ListView;
 
 $this->title = 'Search Project';
@@ -36,18 +39,49 @@ $this->title = 'Search Project';
                 </div>
             </div>
         </div>
+
         <div class="row">
             <div class="col-lg-10">
                 <div class="card">
                     <div class="card-body">
                         <?php echo $this->render('_search', ['model' => $searchModel, 'tags' => $tags]); ?>
 
+                        <div class="row">
+                            <?php foreach ($categories ?? [] as $category): ?>
+                                <div class="col-md-12">
+                                    <div class="card card-primary collapsed-card">
+                                        <div class="card-header">
+                                            <h3 class="card-title">
+                                                <a href="<?= Url::to(['/site/search', 'DocumentSearch[category]' => $category->id]) ?>">
+                                                    <i class="far fa-folder"></i>
+                                                    <?= $category->name ?>
+                                                </a>
+                                            </h3>
+
+                                            <div class="card-tools">
+                                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
+                                                </button>
+                                            </div>
+                                            <!-- /.card-tools -->
+                                        </div>
+                                        <!-- /.card-header -->
+                                        <div class="card-body" style="display: none;">
+                                            Теги связанные с этой категорией
+                                        </div>
+                                        <!-- /.card-body -->
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+
                         <div class="list-group">
-                            <p>
-                                Сортировать:
-                                <?= $sort->link('name', ['label' => 'Наименование']) ?> |
-                                <?= $sort->link('created', ['label' => 'Дата создания']) ?>
-                            </p>
+                            <?php if ($dataProvider->totalCount): ?>
+                                <p>
+                                    Сортировать:
+                                    <?= $sort->link('name', ['label' => 'Наименование']) ?> |
+                                    <?= $sort->link('created', ['label' => 'Дата создания']) ?>
+                                </p>
+                            <?php endif; ?>
 
                             <?= ListView::widget([
                                 'dataProvider' => $dataProvider,

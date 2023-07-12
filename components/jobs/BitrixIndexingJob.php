@@ -117,6 +117,7 @@ class BitrixIndexingJob extends BaseObject implements JobInterface {
                 'name'       => $file['NAME'],
                 'type'       => 'bitrix',
                 'created'    => $file['CREATE_TIME'],
+                'size'       => $file['SIZE'],
                 'mime_type'  => $file['TYPE'],
                 'media_type' => Document::getType($file['TYPE']),
                 'path'       => $file['DOWNLOAD_URL'] ?? $file['DETAIL_URL'],

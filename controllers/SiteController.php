@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\components\services\ServiceInterface;
+use app\models\Category;
 use app\models\Document;
 use app\models\DocumentSearch;
 use app\models\Tag;
@@ -129,8 +130,6 @@ class SiteController extends Controller
     }
 
     /**
-     * Displays search page.
-     *
      * @return string
      */
     public function actionSearch(): string {
@@ -142,11 +141,13 @@ class SiteController extends Controller
         $dataProvider = $searchModel->search($this->request->queryParams);
 
         $tags = Tag::find()->all();
+        $categories = Category::find()->where(['parent_id' => $searchModel->category ?? 0])->all();
 
         return $this->render('search', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'tags' => $tags,
+            'categories' => $categories,
             'sort' => $sort,
         ]);
     }
@@ -267,6 +268,36 @@ class SiteController extends Controller
     public function actionRecreateIndex(): Response {
         Document::deleteIndex();
         Document::createIndex();
+
+        $es = Yii::$app->elasticsearch;
+
+        $es->delete('_ingest/pipeline/attachment');
+        $es->put('_ingest/pipeline/attachment', [], json_encode([
+            'description'  => 'Extract attachment information',
+            'processors' => [
+                [
+                    'attachment' => [
+                        'field' => 'content',
+                        'target_field' => 'attachment',
+                        'indexed_chars' => -1,
+                        'ignore_failure' => true
+                    ],
+                ],
+                [
+                    'set' => [
+                        'field' => 'content',
+                        'value' => '{{{attachment.content}}}',
+                        'ignore_failure' => true,
+                    ],
+                ],
+//                [
+//                    'remove' => [
+//                        'field' => 'content',
+//                        'ignore_failure' => true
+//                    ],
+//                ],
+            ],
+        ]));
 
         return $this->redirect('index');
     }
