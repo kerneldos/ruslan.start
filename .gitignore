@@ -37,3 +37,4 @@ tests/_support/_generated
 /openvpn/*
 /files/
 /config/config.local.php
+/config/env.dev.php

@@ -116,6 +116,7 @@ class DocumentSearch extends Document
             'bool' => [
                 'should' => $should,
                 'filter' => $filter,
+                'minimum_should_match' => 1,
             ],
         ]);
 

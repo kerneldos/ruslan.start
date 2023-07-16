@@ -93,7 +93,7 @@ if (YII_ENV_DEV) {
     $config['modules']['debug'] = [
         'class' => 'yii\debug\Module',
         // uncomment the following to add your IP if you are not connecting from localhost.
-        'allowedIPs' => ['172.21.0.1', '127.0.0.1', '::1'],
+        'allowedIPs' => ['*'],
         'panels' => [
             'elasticsearch' => [
                 'class' => 'yii\\elasticsearch\\DebugPanel',
@@ -105,7 +105,8 @@ if (YII_ENV_DEV) {
     $config['modules']['gii'] = [
         'class' => 'yii\gii\Module',
         // uncomment the following to add your IP if you are not connecting from localhost.
-        'allowedIPs' => ['172.21.0.1', '127.0.0.1', '::1'],
+        'allowedIPs' => ['*'],
+//        'allowedIPs' => ['172.21.0.1', '127.0.0.1', '::1'],
     ];
 }
 
