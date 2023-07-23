@@ -2,16 +2,18 @@
 
 namespace app\models;
 
-use Yii;
-
 /**
  * This is the model class for table "tag".
  *
  * @property int $id
  * @property string $name
  */
-class Tag extends \yii\db\ActiveRecord
-{
+class Tag extends \yii\db\ActiveRecord {
+    /** @var string SCENARIO_IMPORT */
+    const SCENARIO_IMPORT = 'import';
+
+    public $importFile;
+
     /**
      * {@inheritdoc}
      */
@@ -26,9 +28,11 @@ class Tag extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name'], 'required'],
+            [['name'], 'required', 'on' => self::SCENARIO_DEFAULT],
             [['name'], 'string', 'max' => 255],
             [['name'], 'unique'],
+            ['importFile', 'file', 'on' => self::SCENARIO_IMPORT],
+            ['importFile', 'required', 'on' => self::SCENARIO_IMPORT],
         ];
     }
 

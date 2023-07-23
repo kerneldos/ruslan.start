@@ -58,6 +58,7 @@ class DocumentSearch extends Document
                         'default_operator' => 'AND',
                         'analyze_wildcard' => false,
 //                        'analyzer' => 'standard',
+                        'minimum_should_match' => '1',
                     ],
                 ];
             } else {
@@ -106,17 +107,18 @@ class DocumentSearch extends Document
             ];
         }
 
-        $filter[] = [
-            'term' => [
-                'category' => $this->category ?? 0,
-            ],
-        ];
+        if (!empty($this->category)) {
+            $filter[] = [
+                'term' => [
+                    'category' => $this->category,
+                ],
+            ];
+        }
 
         $query->query([
             'bool' => [
-                'should' => $should,
+                'must' => $should,
                 'filter' => $filter,
-                'minimum_should_match' => 1,
             ],
         ]);
 

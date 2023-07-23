@@ -8,6 +8,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Response;
+use yii\web\UploadedFile;
 
 /**
  * TagController implements the CRUD actions for Tag model.
@@ -38,15 +39,39 @@ class TagController extends Controller
     }
 
     /**
-     * Lists all Tag models.
-     *
-     * @return string
+     * @return mixed
      */
-    public function actionIndex(): string {
+    public function actionIndex() {
+        $model = new Tag(['scenario' => Tag::SCENARIO_IMPORT]);
+
+        if ($this->request->isPost) {
+            if ($model->load($this->request->post())) {
+                $model->importFile = UploadedFile::getInstance($model, 'importFile');
+
+                if ($model->validate()) {
+                    $importTags = array_map('trim', explode(PHP_EOL, file_get_contents($model->importFile->tempName)));
+
+                    if (!empty($importTags)) {
+                        foreach ($importTags as $tagName) {
+                            $tag = Tag::find()->where(['name' => $tagName])->one();
+
+                            if (empty($tag)) {
+                                $tag = new Tag(['name' => $tagName]);
+                                $tag->save();
+                            }
+                        }
+                    }
+                }
+
+                return $this->redirect(['index']);
+            }
+        }
+
         $searchModel = new TagSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
         return $this->render('index', [
+            'model' => $model,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
