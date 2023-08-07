@@ -22,6 +22,7 @@ use yii\elasticsearch\Exception;
  * @property int $size
  * @property int $category
  * @property array $tags
+ * @property string $ai_category
  */
 class Document extends ActiveRecord
 {
@@ -106,6 +107,7 @@ class Document extends ActiveRecord
         return [
             'name', 'content', 'created', 'mime_type', 'file', 'media_type',
             'path', 'sha256', 'md5', 'type', 'attachment', 'size', 'category', 'tags',
+            'ai_category',
         ];
     }
 
@@ -116,20 +118,21 @@ class Document extends ActiveRecord
         return [
             // Типы полей: https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#field-datatypes
             'properties' => [
-                'name'       => ['type' => 'text', 'fielddata' => 'true'],
-                'content'    => ['type' => 'text', 'analyzer' => 'standard'],
-                'created'    => ['type' => 'date'],
-                'mime_type'  => ['type' => 'text'],
-                'file'       => ['type' => 'text'],
-                'media_type' => ['type' => 'keyword'],
-                'path'       => ['type' => 'keyword'],
-                'type'       => ['type' => 'keyword'],
-                'sha256'     => ['type' => 'text'],
-                'md5'        => ['type' => 'text'],
-                'size'       => ['type' => 'unsigned_long'],
-                'category'   => ['type' => 'keyword'],
-                'tags'       => ['type' => 'keyword'],
-                'attachment' => [
+                'name'        => ['type' => 'text', 'fielddata' => 'true'],
+                'content'     => ['type' => 'text', 'analyzer' => 'standard'],
+                'created'     => ['type' => 'date'],
+                'mime_type'   => ['type' => 'text'],
+                'file'        => ['type' => 'text'],
+                'media_type'  => ['type' => 'keyword'],
+                'path'        => ['type' => 'keyword'],
+                'type'        => ['type' => 'keyword'],
+                'sha256'      => ['type' => 'text'],
+                'md5'         => ['type' => 'text'],
+                'size'        => ['type' => 'unsigned_long'],
+                'category'    => ['type' => 'keyword'],
+                'ai_category' => ['type' => 'keyword'],
+                'tags'        => ['type' => 'keyword'],
+                'attachment'  => [
                     'type' => 'object',
                     'properties' => [
                         'content' => ['type' => 'text', 'fielddata' => 'true'],

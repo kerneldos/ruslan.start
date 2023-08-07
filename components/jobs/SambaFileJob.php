@@ -3,11 +3,14 @@
 namespace app\components\jobs;
 
 use app\helpers\FileConverter;
+use app\models\AiCategory;
 use app\models\Document;
 use app\models\Tag;
 use Throwable;
 use Yii;
 use yii\base\BaseObject;
+use yii\helpers\ArrayHelper;
+use yii\httpclient\Client;
 use yii\queue\JobInterface;
 
 class SambaFileJob extends BaseObject implements JobInterface {
@@ -47,22 +50,17 @@ class SambaFileJob extends BaseObject implements JobInterface {
                     $documentTag = Document::find()->query([
                         'bool' => [
                             'must' => [
-                                [
-                                    'term' => ['_id' => $this->document->_id],
-                                ],
-                                [
-                                    'simple_query_string' => [
-                                        'fields' => [
-                                            'name^2',
-                                            'attachment.content',
-                                        ],
-                                        'query' => sprintf('*%s*', $tag->name),
-                                        'default_operator' => 'or',
-                                        'analyze_wildcard' => true,
-                                        'minimum_should_match' => '-35%',
+                                'simple_query_string' => [
+                                    'fields' => [
+                                        'name^2',
+                                        'attachment.content',
                                     ],
+                                    'query' => $tag->name,
                                 ],
-                            ]
+                            ],
+                            'filter' => [
+                                'term' => ['_id' => $this->document->_id],
+                            ],
                         ],
                     ])->one();
 
@@ -71,7 +69,24 @@ class SambaFileJob extends BaseObject implements JobInterface {
                     }
                 }
 
+                $client = new Client([
+                    'requestConfig' => [
+                        'format' => Client::FORMAT_JSON,
+                    ],
+                    'baseUrl' => 'http://ai/',
+                ]);
+
+                $request = $client->post('get_text_category', [
+                    'text' => $content,
+                    'categories' => ArrayHelper::getColumn(AiCategory::find()->asArray()->all(), 'name'),
+                    'language' => 'ru',
+                ]);
+
+                $response = $request->send();
+
                 $this->document->tags = $documentTags;
+                $this->document->ai_category = $response->data['prediction'] ?? '';
+
                 $this->document->save();
             }
         } catch (Throwable $exception) {

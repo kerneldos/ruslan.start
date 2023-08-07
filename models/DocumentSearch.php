@@ -81,24 +81,29 @@ class DocumentSearch extends Document
 //            ];
         }
 
+        $filter = [];
         if (!empty($this->tags)) {
-            foreach ($this->tags as $tag) {
-                $should[] = [
-                    'simple_query_string' => [
-                        'fields' => [
-                            'name^2',
-                            'attachment.content',
-                        ],
-                        'query' => sprintf('*%s*', $tag),
-                        'default_operator' => 'or',
-                        'analyze_wildcard' => true,
-                        'minimum_should_match' => '-35%',
-                    ],
-                ];
-            }
+//            foreach ($this->tags as $tag) {
+//                $should[] = [
+//                    'simple_query_string' => [
+//                        'fields' => [
+//                            'name^2',
+//                            'attachment.content',
+//                        ],
+//                        'query' => sprintf('*%s*', $tag),
+//                        'default_operator' => 'or',
+//                        'analyze_wildcard' => true,
+//                        'minimum_should_match' => '-35%',
+//                    ],
+//                ];
+//            }
+            $filter[] = [
+                'terms' => [
+                    'tags' => $this->tags,
+                ],
+            ];
         }
 
-        $filter = [];
         if (!empty($this->types)) {
             $filter[] = [
                 'terms' => [
