@@ -84,7 +84,7 @@ class SambaFileJob extends BaseObject implements JobInterface {
 
                 $response = $request->send();
 
-                file_put_contents(Yii::getAlias('@runtime/logs/ai.log'), print_r($response->data['prediction'] . PHP_EOL, true), FILE_APPEND);
+                file_put_contents(Yii::getAlias('@runtime/logs/ai.log'), print_r($response->data['prediction'], true) . PHP_EOL, FILE_APPEND);
 
                 $this->document->tags = $documentTags;
                 $this->document->ai_category = $response->data['prediction'] ?? '';
