@@ -2,6 +2,8 @@
 
 use yii\helpers\ArrayHelper;
 
+ini_set('memory_limit', '-1');
+
 $params = require __DIR__ . '/params.php';
 $db     = require __DIR__ . '/db.php';
 
