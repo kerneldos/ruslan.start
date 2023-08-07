@@ -39,6 +39,7 @@ YiiAsset::register($this);
                     return Category::find()->select('name')->where(['id' => $model->category])->scalar();
                 },
             ],
+            'ai_category',
             'media_type',
             [
                 'attribute' => 'content',
