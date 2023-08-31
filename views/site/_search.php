@@ -82,10 +82,11 @@ use yii\widgets\ActiveForm;
     </div>
 
     <div class="input-group input-group-lg">
-        <?= Html::activeInput('search', $model, 'content', [
-            'class' => 'form-control form-control-lg',
-            'placeholder' => 'Найти',
-        ]) ?>
+        <select style="width: 100%;" name="DocumentSearch[content]" id="" class="js-content-search"></select>
+<!--        --><?php //= Html::activeInput('select', $model, 'content', [
+//            'class' => 'js-content-search form-control form-control-lg',
+////            'placeholder' => 'Найти',
+//        ]) ?>
 
         <?php if (empty($model->content)): ?>
             <div class="input-group-append">

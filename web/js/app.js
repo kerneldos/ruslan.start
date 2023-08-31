@@ -53,4 +53,38 @@
     });
 
     bsCustomFileInput.init();
+
+    $('.js-content-search').select2({
+        minimumInputLength: 2,
+        tags: [],
+        ajax: {
+            url: '/site/search',
+            dataType: 'json',
+            type: "GET",
+            quietMillis: 50,
+            data: function (query) {
+                return {
+                    DocumentSearch: {content: query.term}
+                };
+            },
+            processResults: function (data) {
+                // Transforms the top-level key of the response object from 'items' to 'results'
+                return {
+                    results: $.map(data.results, function (item) {
+                        return {
+                            text: item.name,
+                            id: item.name
+                        }
+                    })
+                };
+            },
+            results: function (data) {
+                return {
+                    results: $.map(data, function (item) {
+                        return { text: item.name, id: item.name }
+                    })
+                };
+            }
+        }
+    });
 })(jQuery)

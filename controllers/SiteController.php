@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\components\BaseController;
 use app\components\services\ServiceInterface;
 use app\models\Category;
 use app\models\Document;
@@ -12,7 +13,6 @@ use yii\base\InvalidConfigException;
 use yii\data\Sort;
 use Yii;
 use yii\elasticsearch\Exception;
-use yii\web\Controller;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\RangeNotSatisfiableHttpException;
@@ -21,7 +21,7 @@ use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
 
-class SiteController extends Controller
+class SiteController extends BaseController
 {
     /**
      * {@inheritdoc}
@@ -130,15 +130,19 @@ class SiteController extends Controller
     }
 
     /**
-     * @return string
+     * @return string|Response
      */
-    public function actionSearch(): string {
+    public function actionSearch() {
         $sort = new Sort([
             'attributes' => ['name', 'created'],
         ]);
 
         $searchModel = new DocumentSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
+
+        if (Yii::$app->request->isAjax) {
+            return $this->asJson(['results' => $dataProvider->getModels(), 'total_count' => $dataProvider->totalCount]);
+        }
 
         $tags = Tag::find()->all();
         $categories = Category::find()->where(['parent_id' => $searchModel->category ?? 0])->all();

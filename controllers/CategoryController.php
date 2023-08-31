@@ -2,9 +2,9 @@
 
 namespace app\controllers;
 
+use app\components\BaseController;
 use app\models\Category;
 use app\models\CategorySearch;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Response;
@@ -12,22 +12,13 @@ use yii\web\Response;
 /**
  * CategoryController implements the CRUD actions for Category model.
  */
-class CategoryController extends Controller
+class CategoryController extends BaseController
 {
     /**
      * @inheritDoc
      */
     public function behaviors(): array {
         return array_merge(parent::behaviors(), [
-            'access' => [
-                'class' => 'yii\filters\AccessControl',
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                ],
-            ],
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [

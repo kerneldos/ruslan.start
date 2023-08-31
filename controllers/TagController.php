@@ -20,15 +20,6 @@ class TagController extends Controller
      */
     public function behaviors(): array {
         return array_merge(parent::behaviors(), [
-            'access' => [
-                'class' => 'yii\filters\AccessControl',
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                ],
-            ],
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [

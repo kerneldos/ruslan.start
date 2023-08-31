@@ -2,9 +2,9 @@
 
 namespace app\controllers;
 
+use app\components\BaseController;
 use app\models\Config;
 use app\models\ConfigSearch;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Response;
@@ -12,22 +12,13 @@ use yii\web\Response;
 /**
  * ConfigController implements the CRUD actions for Config model.
  */
-class ConfigController extends Controller
+class ConfigController extends BaseController
 {
     /**
      * @inheritDoc
      */
     public function behaviors(): array {
         return array_merge(parent::behaviors(), [
-            'access' => [
-                'class' => 'yii\filters\AccessControl',
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                ],
-            ],
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
