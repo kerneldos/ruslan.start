@@ -4,6 +4,7 @@ namespace app\components\jobs;
 
 use app\helpers\FileConverter;
 use app\models\AiCategory;
+use app\models\AiTextCategory;
 use app\models\Document;
 use app\models\Tag;
 use Throwable;
@@ -34,7 +35,7 @@ class SambaFileJob extends BaseObject implements JobInterface {
         }
 
         try {
-            $hash = md5(join('', [$this->document->created, $this->document->size]));
+            $hash = md5(join('', [$this->document->created, $this->document->size ?? '']));
 
             $this->document->content = $content;
             $this->document->sha256  = $hash;
@@ -69,6 +70,12 @@ class SambaFileJob extends BaseObject implements JobInterface {
                     }
                 }
 
+                $this->document->tags = $documentTags;
+            }
+
+            $hash = md5($content);
+            $aiTextCategory = AiTextCategory::findOne(['hash' => $hash]);
+            if (empty($aiTextCategory)) {
                 $client = new Client([
                     'requestConfig' => [
                         'format' => Client::FORMAT_JSON,
@@ -84,14 +91,16 @@ class SambaFileJob extends BaseObject implements JobInterface {
 
                 $response = $request->send();
 
-                $log = join(' :: ', [$this->document->name, $content, $response->data['prediction'] ?? 'AI error']);
-                file_put_contents(Yii::getAlias('@runtime/logs/ai.log'), $log . PHP_EOL, FILE_APPEND);
-
-                $this->document->tags = $documentTags;
-                $this->document->ai_category = $response->data['prediction'] ?? '';
-
-                $this->document->save();
+                $aiTextCategory = new AiTextCategory([
+                    'hash' => $hash,
+                    'name' => $response->data['prediction'] ?? '',
+                ]);
+                $aiTextCategory->save();
             }
+
+            $this->document->ai_category = $aiTextCategory->id;
+
+            $this->document->save();
         } catch (Throwable $exception) {
             file_put_contents(Yii::getAlias('@runtime/logs/insert.log'), print_r($exception->getMessage(), true), FILE_APPEND);
         }

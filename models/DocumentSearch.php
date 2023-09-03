@@ -120,6 +120,14 @@ class DocumentSearch extends Document
             ];
         }
 
+        if (!empty($this->ai_category)) {
+            $filter[] = [
+                'term' => [
+                    'ai_category' => $this->ai_category,
+                ],
+            ];
+        }
+
         $query->query([
             'bool' => [
                 'must' => $should,
