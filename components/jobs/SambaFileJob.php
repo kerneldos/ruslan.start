@@ -75,30 +75,45 @@ class SambaFileJob extends BaseObject implements JobInterface {
                 $this->document->tags = $documentTags;
             }
 
-            $hash = md5($content);
-            $aiTextCategory = AiTextCategory::findOne(['hash' => $hash]);
-            if (empty($aiTextCategory)) {
-                $client = new Client([
-                    'requestConfig' => [
-                        'format' => Client::FORMAT_JSON,
-                    ],
-                    'baseUrl' => 'http://ai/',
-                ]);
+            $client = new Client([
+                'requestConfig' => [
+                    'format' => Client::FORMAT_JSON,
+                ],
+                'baseUrl' => 'http://ai/',
+            ]);
 
-                $request = $client->post('get_category', ['content' => $content]);
+            $request = $client->post('get_category', ['content' => $content]);
 
-                $response = $request->send();
+            $response = $request->send();
 
-                $aiTextCategory = new AiTextCategory([
-                    'hash' => $hash,
-                    'name' => $response->data['category'] ?? '',
-                ]);
-                $aiTextCategory->save();
+            if (!empty($response->data['category'])) {
+                $aiCategory = AiCategory::findOne(['name' => $response->data['category']]);
+                if (empty($aiCategory)) {
+                    $aiCategory = new AiCategory(['name' => $response->data['category']]);
+                    $aiCategory->save();
+                }
+
+                $aiCategoryId = $aiCategory->id;
+                if (!empty($response->data['subcategory'])) {
+                    $subCategory = AiCategory::findOne([
+                        'name' => $response->data['subcategory'],
+                        'parent_id' => $aiCategory->id,
+                    ]);
+
+                    if (empty($subCategory)) {
+                        $subCategory = new AiCategory([
+                            'name' => $response->data['subcategory'],
+                            'parent_id' => $aiCategory->id,
+                        ]);
+                        $subCategory->save();
+                    }
+
+                    $aiCategoryId = $subCategory->id;
+                }
+
+                $this->document->ai_category = $aiCategoryId;
+                $this->document->save();
             }
-
-            $this->document->ai_category = $aiTextCategory->id;
-
-            $this->document->save();
         } catch (Throwable $exception) {
             file_put_contents(Yii::getAlias('@runtime/logs/insert.log'), print_r($exception->getMessage(), true), FILE_APPEND);
         }
