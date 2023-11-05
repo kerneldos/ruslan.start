@@ -13,7 +13,7 @@ class Yandex extends \yii\authclient\clients\Yandex implements ServiceInterface 
 
     const CATEGORY_NAME = 'Yandex Диск';
 
-    const RETURN_URL = 'https://45.12.74.245/site/get-token?service=yandex';
+    const RETURN_URL = 'https://yanayarosh.ru/site/get-token?service=yandex';
 //    const RETURN_URL = 'https://127.0.0.1/site/get-token?service=yandex';
 
     /**
@@ -51,9 +51,21 @@ class Yandex extends \yii\authclient\clients\Yandex implements ServiceInterface 
         return empty($this->accessToken);
     }
 
+    /**
+     * @param $request
+     * @param $accessToken
+     *
+     * @return void
+     */
     public function applyAccessTokenToRequest($request, $accessToken)
     {
         $request->addHeaders(['Authorization' => $accessToken->getToken()]);
     }
 
+    /**
+     * @return string
+     */
+    public function getStateKeyPrefix(): string {
+        return self::SERVICE_NAME . '_';
+    }
 }

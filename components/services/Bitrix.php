@@ -13,7 +13,7 @@ class Bitrix extends OAuth2 implements ServiceInterface {
 
     const CATEGORY_NAME = 'Bitrix Диск';
 
-    const RETURN_URL = 'https://45.12.74.245/site/get-token?service=bitrix';
+    const RETURN_URL = 'https://yanayarosh.ru/site/get-token?service=bitrix';
 //    const RETURN_URL = 'https://127.0.0.1/site/get-token?service=bitrix';
 
     /** @inheritdoc */
@@ -89,5 +89,12 @@ class Bitrix extends OAuth2 implements ServiceInterface {
         $data['auth'] = $accessToken->getToken();
 
         $request->setData($data);
+    }
+
+    /**
+     * @return string
+     */
+    public function getStateKeyPrefix(): string {
+        return self::SERVICE_NAME . '_';
     }
 }

@@ -23,24 +23,26 @@ class SambaFileJob extends BaseObject implements JobInterface {
      * @return void
      */
     public function execute($queue) {
-        $content = '';
-        if ($this->document->size < 20 * 1024 * 1024) {
-            try {
-                $converter = new FileConverter(['document' => $this->document]);
+        $existsDocument = Document::findOne(['md5' => $this->document->md5, 'type' => $this->document->type]);
 
-                $content = $converter->convert();
-            } catch (Throwable $exception) {
-                file_put_contents(Yii::getAlias('@runtime/logs/scan.log'), print_r($exception->getMessage(), true), FILE_APPEND);
+        $content = '';
+        if (empty($existsDocument)) {
+            if ($this->document->size < 20 * 1024 * 1024) {
+                try {
+                    $converter = new FileConverter(['document' => $this->document]);
+
+                    $content = $converter->convert();
+                } catch (Throwable $exception) {
+                    file_put_contents(Yii::getAlias('@runtime/logs/scan.log'), print_r($exception->getMessage(), true), FILE_APPEND);
+                }
             }
+
+            $this->document->content = $content;
+            $this->document->save();
         }
 
         try {
-            $hash = md5(join('', [$this->document->created, $this->document->size ?? '']));
-
-            $this->document->content = $content;
-            $this->document->sha256  = $hash;
-            $this->document->md5     = $hash;
-            $this->document->save();
+            $this->document = Document::findOne($this->document->_id);
 
             $documentTags = [];
 

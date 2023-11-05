@@ -3,13 +3,16 @@
 namespace app\models;
 
 use Yii;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "ai_category".
  *
  * @property int $id
+ * @property int $parent_id
  * @property string $name
  * @property string|null $description
+ * @property AiCategory[] $children
  */
 class AiCategory extends \yii\db\ActiveRecord
 {
@@ -27,6 +30,7 @@ class AiCategory extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            ['parent_id', 'integer'],
             [['name'], 'required'],
             [['description'], 'string'],
             [['name'], 'string', 'max' => 255],
@@ -40,8 +44,16 @@ class AiCategory extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
+            'parent_id' => 'Parent ID',
             'name' => 'Name',
             'description' => 'Description',
         ];
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getChildren(): ActiveQuery {
+        return $this->hasMany('app\models\AiCategory', ['parent_id' => 'id']);
     }
 }
