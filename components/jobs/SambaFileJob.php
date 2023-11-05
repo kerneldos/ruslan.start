@@ -85,17 +85,13 @@ class SambaFileJob extends BaseObject implements JobInterface {
                     'baseUrl' => 'http://ai/',
                 ]);
 
-                $request = $client->post('get_text_category', [
-                    'text' => $content,
-                    'categories' => ArrayHelper::getColumn(AiCategory::find()->asArray()->all(), 'name'),
-                    'language' => 'ru',
-                ]);
+                $request = $client->post('get_category', ['content' => $content]);
 
                 $response = $request->send();
 
                 $aiTextCategory = new AiTextCategory([
                     'hash' => $hash,
-                    'name' => $response->data['prediction'] ?? '',
+                    'name' => $response->data['category'] ?? '',
                 ]);
                 $aiTextCategory->save();
             }
