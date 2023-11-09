@@ -50,7 +50,7 @@ class YandexIndexingJob extends BaseObject implements JobInterface {
                             'type'       => 'yandex',
                             'created'    => $file['created'],
                             'mime_type'  => $file['mime_type'],
-                            'media_type' => $file['media_type'],
+                            'media_type' => Document::getType($file['mime_type']),
                             'path'       => $downloadUrlResponse['href'],
                             'sha256'     => $file['sha256'],
                             'md5'        => $file['md5'],
