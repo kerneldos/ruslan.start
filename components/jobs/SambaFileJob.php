@@ -3,15 +3,12 @@
 namespace app\components\jobs;
 
 use app\components\TikaClient;
-use app\helpers\FileConverter;
 use app\models\AiCategory;
-use app\models\AiTextCategory;
 use app\models\Document;
 use app\models\Tag;
 use Throwable;
 use Yii;
 use yii\base\BaseObject;
-use yii\helpers\ArrayHelper;
 use yii\httpclient\Client;
 use yii\queue\JobInterface;
 
@@ -28,25 +25,18 @@ class SambaFileJob extends BaseObject implements JobInterface {
 
         $content = '';
         if (empty($existsDocument)) {
-//            if ($this->document->size < 200 * 1024 * 1024) {
-//                try {
-//                    $client = TikaClient::make('tika.local', 9998);
-//                    $client->setTimeout(300);
-//                    $client->setOCRLanguages(['rus', 'eng']);
-//
-//                    $content = $client->getText($this->document->path);
-//                } catch (\Throwable $exception) {
-//                    $content = 'Error get text';
-//                }
-//            }
-            try {
-                $client = TikaClient::make('tika.local', 9998);
-                $client->setTimeout(300);
-                $client->setOCRLanguages(['rus', 'eng']);
+            if ($this->document->size < 200 * 1024 * 1024) {
+                try {
+                    $client = TikaClient::make('tika.local', 9998);
+                    $client->setTimeout(300);
+                    $client->setOCRLanguages(['rus', 'eng']);
 
-                $content = $client->getText($this->document->path);
-            } catch (\Throwable $exception) {
-                $content = 'Error get text';
+                    $content = $client->getText($this->document->path);
+                } catch (\Throwable $exception) {
+                    $content = 'Error get text';
+                }
+            } else {
+                $content = 'Very Large File';
             }
 
             $this->document->content = $content;
@@ -94,7 +84,7 @@ class SambaFileJob extends BaseObject implements JobInterface {
                 'baseUrl' => 'http://ai/',
             ]);
 
-            $request = $client->post('get_category', ['content' => $content]);
+            $request = $client->post('get_category', ['content' => base64_encode($content)]);
 
             $response = $request->send();
 
