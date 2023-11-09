@@ -1,5 +1,6 @@
 <?php
 
+use app\models\AiCategory;
 use app\models\Category;
 use app\models\Document;
 use yii\helpers\Html;
@@ -37,6 +38,13 @@ YiiAsset::register($this);
                 'format' => 'text',
                 'value' => function(Document $model) {
                     return Category::find()->select('name')->where(['id' => $model->category])->scalar();
+                },
+            ],
+            [
+                'attribute' => 'ai_category',
+                'format' => 'text',
+                'value' => function(Document $model) {
+                    return AiCategory::find()->select('name')->where(['id' => $model->ai_category])->scalar();
                 },
             ],
             'ai_category',
