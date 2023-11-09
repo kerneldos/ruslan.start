@@ -47,7 +47,7 @@ YiiAsset::register($this);
                     $category = AiCategory::findOne(['id' => $model->ai_category]);
 
                     if (!empty($category)) {
-                        return Html::a($category->name, ['/project/view', ['categoryId' => $category->id]]);
+                        return Html::a($category->name, ['/project/view', 'categoryId' => $category->id]);
                     }
 
                     return '';
