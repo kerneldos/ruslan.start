@@ -28,16 +28,25 @@ class SambaFileJob extends BaseObject implements JobInterface {
 
         $content = '';
         if (empty($existsDocument)) {
-            if ($this->document->size < 200 * 1024 * 1024) {
-                try {
-                    $client = TikaClient::make('tika.local', 9998);
-                    $client->setTimeout(300);
-                    $client->setOCRLanguages(['rus', 'eng']);
+//            if ($this->document->size < 200 * 1024 * 1024) {
+//                try {
+//                    $client = TikaClient::make('tika.local', 9998);
+//                    $client->setTimeout(300);
+//                    $client->setOCRLanguages(['rus', 'eng']);
+//
+//                    $content = $client->getText($this->document->path);
+//                } catch (\Throwable $exception) {
+//                    $content = 'Error get text';
+//                }
+//            }
+            try {
+                $client = TikaClient::make('tika.local', 9998);
+                $client->setTimeout(300);
+                $client->setOCRLanguages(['rus', 'eng']);
 
-                    $content = $client->getText($this->document->path);
-                } catch (\Throwable $exception) {
-                    $content = 'Error get text';
-                }
+                $content = $client->getText($this->document->path);
+            } catch (\Throwable $exception) {
+                $content = 'Error get text';
             }
 
             $this->document->content = $content;
