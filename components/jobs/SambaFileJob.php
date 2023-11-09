@@ -2,6 +2,7 @@
 
 namespace app\components\jobs;
 
+use app\components\TikaClient;
 use app\helpers\FileConverter;
 use app\models\AiCategory;
 use app\models\AiTextCategory;
@@ -13,7 +14,6 @@ use yii\base\BaseObject;
 use yii\helpers\ArrayHelper;
 use yii\httpclient\Client;
 use yii\queue\JobInterface;
-use Vaites\ApacheTika\Client as TikaClient;
 
 class SambaFileJob extends BaseObject implements JobInterface {
     public Document $document;
@@ -28,7 +28,7 @@ class SambaFileJob extends BaseObject implements JobInterface {
 
         $content = '';
         if (empty($existsDocument)) {
-            if ($this->document->size < 20 * 1024 * 1024) {
+            if ($this->document->size < 200 * 1024 * 1024) {
                 try {
                     $client = TikaClient::make('tika.local', 9998);
                     $client->setTimeout(300);
