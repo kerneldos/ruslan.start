@@ -42,9 +42,15 @@ YiiAsset::register($this);
             ],
             [
                 'attribute' => 'ai_category',
-                'format' => 'text',
+                'format' => 'raw',
                 'value' => function(Document $model) {
-                    return AiCategory::find()->select('name')->where(['id' => $model->ai_category])->scalar();
+                    $category = AiCategory::findOne(['id' => $model->ai_category]);
+
+                    if (!empty($category)) {
+                        return Html::a($category->name, ['/project/view', ['categoryId' => $category->id]]);
+                    }
+
+                    return '';
                 },
             ],
             'ai_category',
