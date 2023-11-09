@@ -32,7 +32,11 @@ class YandexIndexingJob extends BaseObject implements JobInterface {
         /** @var OAuth2 $client */
         $client = Yii::$app->authClientCollection->getClient(Yandex::SERVICE_NAME);
 
-        $response = $client->api('disk/resources/files');
+        $response = $client->api('disk/resources/files', 'GET', [
+            'limit' => 500,
+            'offset' => 0,
+        ]);
+
         if (!empty($response['items'])) {
             Yii::debug($response['items']);
 
