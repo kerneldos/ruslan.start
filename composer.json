@@ -29,7 +29,8 @@
         "thiagoalessio/tesseract_ocr": "^2.12",
         "ext-rar": "*",
         "ext-json": "*",
-        "yiisoft/yii2-authclient": "*"
+        "yiisoft/yii2-authclient": "*",
+        "vaites/php-apache-tika": "^1.3"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

@@ -13,6 +13,7 @@ use yii\base\BaseObject;
 use yii\helpers\ArrayHelper;
 use yii\httpclient\Client;
 use yii\queue\JobInterface;
+use Vaites\ApacheTika\Client as TikaClient;
 
 class SambaFileJob extends BaseObject implements JobInterface {
     public Document $document;
@@ -29,11 +30,13 @@ class SambaFileJob extends BaseObject implements JobInterface {
         if (empty($existsDocument)) {
             if ($this->document->size < 20 * 1024 * 1024) {
                 try {
-                    $converter = new FileConverter(['document' => $this->document]);
+                    $client = TikaClient::make('tika.local', 9998);
+                    $client->setTimeout(300);
+                    $client->setOCRLanguages(['rus', 'eng']);
 
-                    $content = $converter->convert();
-                } catch (Throwable $exception) {
-                    file_put_contents(Yii::getAlias('@runtime/logs/scan.log'), print_r($exception->getMessage(), true), FILE_APPEND);
+                    $content = $client->getText($this->document->path);
+                } catch (\Throwable $exception) {
+                    $content = 'Error get text';
                 }
             }
 

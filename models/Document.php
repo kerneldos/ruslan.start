@@ -162,7 +162,7 @@ class Document extends ActiveRecord
     public static function settings(): array {
         return [
             'number_of_replicas' => 0,
-            'default_pipeline' => 'attachment',
+//            'default_pipeline' => 'attachment',
             'analysis' => [
                 'filter' => [
                     'ru_stop' => [
