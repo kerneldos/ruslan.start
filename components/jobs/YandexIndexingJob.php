@@ -41,25 +41,23 @@ class YandexIndexingJob extends BaseObject implements JobInterface {
             Yii::debug($response['items']);
 
             foreach ($response['items'] as $file) {
-                if (empty(Document::findOne(['md5' => $file['md5']]))) {
-                    $downloadUrlResponse = $client->api('disk/resources/download', 'GET', ['path' => $file['path']]);
+                $downloadUrlResponse = $client->api('disk/resources/download', 'GET', ['path' => $file['path']]);
 
-                    if (!empty($downloadUrlResponse)) {
-                        $document = new Document([
-                            'name'       => $file['name'],
-                            'type'       => 'yandex',
-                            'created'    => $file['created'],
-                            'mime_type'  => $file['mime_type'],
-                            'media_type' => Document::getType($file['mime_type']),
-                            'path'       => $downloadUrlResponse['href'],
-                            'sha256'     => $file['sha256'],
-                            'md5'        => $file['md5'],
-                            'category'   => $this->rootCategoryId,
-                            'file'       => $file['path'],
-                        ]);
+                if (!empty($downloadUrlResponse)) {
+                    $document = new Document([
+                        'name'       => $file['name'],
+                        'type'       => 'yandex',
+                        'created'    => $file['created'],
+                        'mime_type'  => $file['mime_type'],
+                        'media_type' => Document::getType($file['mime_type']),
+                        'path'       => $downloadUrlResponse['href'],
+                        'sha256'     => $file['sha256'],
+                        'md5'        => $file['md5'],
+                        'category'   => $this->rootCategoryId,
+                        'file'       => $file['path'],
+                    ]);
 
-                        Yii::$app->queue->push(new SambaFileJob(['document' => $document]));
-                    }
+                    Yii::$app->queue->push(new SambaFileJob(['document' => $document]));
                 }
             }
         } else {
