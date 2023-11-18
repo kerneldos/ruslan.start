@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\components\BaseController;
 use app\components\services\ServiceInterface;
+use app\components\services\Yandex;
 use app\models\Category;
 use app\models\Document;
 use app\models\DocumentSearch;
@@ -234,18 +235,27 @@ class SiteController extends BaseController
     }
 
     /**
-     * @param string $path
-     * @param string $name
-     * @param string $type
+     * @param string $id
      *
      * @return Response
+     * @throws NotFoundHttpException
      * @throws RangeNotSatisfiableHttpException
      */
-    public function actionDownload(string $path, string $name, string $type): Response {
-        $content = file_get_contents($path);
+    public function actionDownload(string $id): Response {
+        $document = $this->findModel($id);
+
+        if ($document->type == 'yandex') {
+            /** @var OAuth2 $client */
+            $client = Yii::$app->authClientCollection->getClient(Yandex::SERVICE_NAME);
+
+            $response = $client->api('disk/resources/download', 'GET', ['path' => $document->file]);
+            $content  = file_get_contents($response['href']);
+        } else {
+            $content = file_get_contents($document->path);
+        }
 
         if (!empty($content)) {
-            return Yii::$app->response->sendContentAsFile($content, $name);
+            return Yii::$app->response->sendContentAsFile($content, $document->name);
         }
 
         return $this->redirect('index');

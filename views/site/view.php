@@ -27,7 +27,7 @@ YiiAsset::register($this);
                 'attribute' => 'file',
                 'format' => 'raw',
                 'value' => function(Document $model) {
-                    return Html::a('Скачать', Url::to(['download', 'path' => $model->path, 'name' => $model->name, 'type' => $model->type]), [
+                    return Html::a('Скачать', Url::to(['download', 'id' => $model->_id]), [
                         'target' => '_blank',
                         'class' => 'btn btn-default',
                     ]);
@@ -53,7 +53,6 @@ YiiAsset::register($this);
                     return '';
                 },
             ],
-            'ai_category',
             'media_type',
             [
                 'attribute' => 'content',

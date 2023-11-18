@@ -55,6 +55,7 @@ class YandexIndexingJob extends BaseObject implements JobInterface {
                             'sha256'     => $file['sha256'],
                             'md5'        => $file['md5'],
                             'category'   => $this->rootCategoryId,
+                            'file'       => $file['path'],
                         ]);
 
                         Yii::$app->queue->push(new SambaFileJob(['document' => $document]));
