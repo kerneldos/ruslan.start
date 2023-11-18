@@ -66,7 +66,7 @@ class DocumentSearch extends Document
                     'simple_query_string' => [
                         'fields' => [
                             'name^2',
-                            'attachment.content',
+                            'content',
                         ],
                         'query' => sprintf('*%s*', $this->content),
                         'default_operator' => 'or',
