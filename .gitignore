@@ -1,3 +1,8 @@
+# yii console commands
+/yii
+/yii_test
+/yii_test.bat
+
 # phpstorm project files
 .idea
 
@@ -18,9 +23,6 @@ Thumbs.db
 # composer itself is not needed
 composer.phar
 
-# composer lock
-composer.lock
-
 # Mac DS_Store Files
 .DS_Store
 
@@ -29,12 +31,14 @@ phpunit.phar
 # local phpunit config
 /phpunit.xml
 
-tests/_output/*
-tests/_support/_generated
-
-#vagrant folder
+# vagrant runtime
 /.vagrant
-/openvpn/*
-/files/
-/config/config.local.php
-/config/env.dev.php
+
+# ignore generated files
+/consumer/web/index.php
+/consumer/web/index-test.php
+/consumer/web/robots.txt
+/login/web/index.php
+/login/web/index-test.php
+/login/web/robots.txt
+/consumer/config/client/
