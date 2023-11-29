@@ -70,7 +70,7 @@ class SiteController extends Controller
      * @return Response
      */
     public function actionIndex(): Response {
-        return $this->redirect('https://demo.app.ru');
+        return $this->redirect('https://' . Yii::$app->user->identity->temp_domain . '.yanayarosh.ru');
 //        return $this->render('index');
     }
 
@@ -82,14 +82,14 @@ class SiteController extends Controller
     public function actionLogin()
     {
         if (!Yii::$app->user->isGuest) {
-            return $this->redirect('https://' . Yii::$app->user->identity->temp_domain . '.app.ru');
+            return $this->redirect('https://' . Yii::$app->user->identity->temp_domain . '.yanayarosh.ru');
         }
 
         $this->layout = 'login';
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->redirect('https://' . $model->redirectUrl . '.app.ru');
+            return $this->redirect('https://' . $model->redirectUrl . '.yanayarosh.ru');
         }
 
         $model->password = '';
