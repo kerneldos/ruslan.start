@@ -82,9 +82,9 @@ class SignupForm extends Model
     }
 
     /**
-     * @return mixed
+     * @return User|null
      */
-    public function getUser() {
+    public function getUser(): User {
         return $this->_user;
     }
 }

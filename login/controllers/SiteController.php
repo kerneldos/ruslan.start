@@ -2,23 +2,24 @@
 
 namespace login\controllers;
 
-use console\controllers\NewConsumerController;
+use common\models\Domain;
+use common\models\LoginForm;
+use InvalidArgumentException;
 use login\models\PasswordResetRequestForm;
 use login\models\ResendVerificationEmailForm;
 use login\models\ResetPasswordForm;
 use login\models\SignupForm;
 use login\models\VerifyEmailForm;
-use common\models\LoginForm;
-use InvalidArgumentException;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\InvalidRouteException;
+use yii\console\Application;
 use yii\console\Exception;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
-use yii\httpclient\Client;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
@@ -70,8 +71,9 @@ class SiteController extends Controller
      * @return Response
      */
     public function actionIndex(): Response {
-        return $this->redirect('https://' . Yii::$app->user->identity->temp_domain . '.yanayarosh.ru');
-//        return $this->render('index');
+        $redirectUrl = sprintf('https://%s.%s', Yii::$app->user->identity->temp_domain, Yii::$app->params['main_domain']);
+
+        return $this->redirect($redirectUrl);
     }
 
     /**
@@ -82,14 +84,18 @@ class SiteController extends Controller
     public function actionLogin()
     {
         if (!Yii::$app->user->isGuest) {
-            return $this->redirect('https://' . Yii::$app->user->identity->temp_domain . '.yanayarosh.ru');
+            $redirectUrl = sprintf('https://%s.%s', Yii::$app->user->identity->temp_domain, Yii::$app->params['main_domain']);
+
+            return $this->redirect($redirectUrl);
         }
 
         $this->layout = 'login';
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->redirect('https://' . $model->redirectUrl . '.yanayarosh.ru');
+            $redirectUrl = sprintf('https://%s.%s', $model->redirectUrl, Yii::$app->params['main_domain']);
+
+            return $this->redirect($redirectUrl);
         }
 
         $model->password = '';
@@ -111,25 +117,32 @@ class SiteController extends Controller
     }
 
     /**
-     * Signs user up.
-     *
-     * @return Response|string
+     * @return string
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws InvalidRouteException
+     * @throws \yii\db\Exception
+     * @throws \yii\httpclient\Exception
+     * @throws NotFoundHttpException
      */
-    public function actionSignup()
-    {
+    public function actionSignup(): string {
         $model = new SignupForm();
         if ($model->load(Yii::$app->request->post()) && $model->signup()) {
             Yii::$app->session->setFlash('success', 'Thank you for registration. Please check your inbox for verification email.');
 
-            $str = '0123456789abcdefghijklmnopqrstuvwxyz';
-
             $user = $model->getUser();
 
-            do {
-                $tempDomain = substr(str_shuffle($str), 0, 6);
+            $domain = Domain::findOne(['user_id' => null]);
+            if (!empty($domain)) {
+                $domain->user_id = $user->id;
 
-                $user->temp_domain = $tempDomain;
-            } while (!$user->save());
+                if ($domain->save()) {
+                    $user->temp_domain = $domain->temp_name;
+                    $user->save();
+                }
+            } else {
+                throw new NotFoundHttpException('Server Error');
+            }
 
             $consumerDbName = 'consumer_' . $user->temp_domain;
 
@@ -145,7 +158,7 @@ class SiteController extends Controller
             );
             $config['components']['db']['dsn'] = sprintf('mysql:host=mysql;dbname=%s', $consumerDbName);
 
-            new \yii\console\Application($config);
+            new Application($config);
 
             ob_start();
                 Yii::$app->runAction('new-consumer/init', [$user->temp_domain]);
@@ -153,52 +166,6 @@ class SiteController extends Controller
             ob_get_clean();
 
             Yii::$app = $oldApp;
-
-            $client = new \yii\httpclient\Client();
-            $client->get('https://api.beget.com/api/domain/addSubdomainVirtual', [
-                'login' => 'amigor43',
-                'passwd' => 'bS57nPyX&7Qr',
-                'input_format' => 'json',
-                'output_format' => 'json',
-                'input_data' => json_encode([
-                    'domain_id' => 9706501,
-                    'subdomain' => $user->temp_domain,
-                ]),
-            ])->send();
-
-            $client->get('https://api.beget.com/api/dns/changeRecords', [
-                'login' => 'amigor43',
-                'passwd' => 'bS57nPyX&7Qr',
-                'input_format' => 'json',
-                'output_format' => 'json',
-                'input_data' => json_encode([
-                    'fqdn' => $user->temp_domain . '.yanayarosh.ru',
-                    'records' => [
-                        'A' => [
-                            [
-                                'priority' => 10,
-                                'value' => '57.129.5.67',
-                            ],
-                        ],
-                        'MX' => [
-                            [
-                                'priority' => 10,
-                                'value' => 'mx1.beget.ru'
-                            ],
-                            [
-                                'priority' => 20,
-                                'value' => 'mx2.beget.ru'
-                            ]
-                        ],
-                        'TXT' => [
-                            [
-                                'priority' => 10,
-                                'value' => 'v=spf1 redirect=beget.com'
-                            ]
-                        ]
-                    ],
-                ]),
-            ])->send();
         }
 
         $this->layout = 'signup';
@@ -265,7 +232,6 @@ class SiteController extends Controller
      *
      * @return Response
      * @throws BadRequestHttpException
-     * @throws \yii\httpclient\Exception
      */
     public function actionVerifyEmail(string $token): Response {
         try {
@@ -277,7 +243,9 @@ class SiteController extends Controller
         if (($user = $model->verifyEmail()) && Yii::$app->user->login($user)) {
             Yii::$app->session->setFlash('success', 'Your email has been confirmed!');
 
-            return $this->redirect('https://' . $user->temp_domain . '.yanayarosh.ru');
+            $redirectUrl = sprintf('https://%s.%s', $user->temp_domain, Yii::$app->params['main_domain']);
+
+            return $this->redirect($redirectUrl);
         }
 
         Yii::$app->session->setFlash('error', 'Sorry, we are unable to verify your account with provided token.');
