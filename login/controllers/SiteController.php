@@ -281,10 +281,16 @@ class SiteController extends Controller
 
             do {
                 try {
-                    $request = $client->get('https://' . $user->temp_domain . '.yanayarosh.ru')->send();
+                    $request = $client->get('https://cwkhjp.yanayarosh.ru')
+                        ->setOptions([
+                            'sslallow_self_signed' => true,
+                            'sslverify_peer_name'  => false,
+                        ])
+                        ->send();
 
                     $isOk = $request->isOk;
                 } catch (\Throwable $exception) {
+                    $request = null;
                     $isOk = false;
                 }
             } while (!$isOk);
