@@ -280,8 +280,14 @@ class SiteController extends Controller
             $client = new \yii\httpclient\Client();
 
             do {
-                $request = $client->get('https://' . $user->temp_domain . '.yanayarosh.ru')->send();
-            } while (!$request->isOk);
+                try {
+                    $request = $client->get('https://' . $user->temp_domain . '.yanayarosh.ru')->send();
+
+                    $isOk = $request->isOk;
+                } catch (\Throwable $exception) {
+                    $isOk = false;
+                }
+            } while (!$isOk);
 
             return $this->redirect('https://' . $user->temp_domain . '.yanayarosh.ru');
         }
