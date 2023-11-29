@@ -277,24 +277,6 @@ class SiteController extends Controller
         if (($user = $model->verifyEmail()) && Yii::$app->user->login($user)) {
             Yii::$app->session->setFlash('success', 'Your email has been confirmed!');
 
-            $client = new \yii\httpclient\Client();
-
-            do {
-                try {
-                    $request = $client->get('https://cwkhjp.yanayarosh.ru')
-                        ->setOptions([
-                            'sslallow_self_signed' => true,
-                            'sslverify_peer_name'  => false,
-                        ])
-                        ->send();
-
-                    $isOk = $request->isOk;
-                } catch (\Throwable $exception) {
-                    $request = null;
-                    $isOk = false;
-                }
-            } while (!$isOk);
-
             return $this->redirect('https://' . $user->temp_domain . '.yanayarosh.ru');
         }
 
