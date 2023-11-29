@@ -15,6 +15,7 @@ class SignupForm extends Model
     public $email;
     public $password;
 
+    private $_user;
 
     /**
      * {@inheritdoc}
@@ -46,7 +47,7 @@ class SignupForm extends Model
         if (!$this->validate()) {
             return null;
         }
-        
+
         $user = new User();
         $user->username = $this->username;
         $user->email = $this->email;
@@ -54,7 +55,10 @@ class SignupForm extends Model
         $user->generateAuthKey();
         $user->generateEmailVerificationToken();
 
-        return $user->save() && $this->sendEmail($user);
+        $userSave = $user->save();
+        $this->_user = $user;
+
+        return $userSave && $this->sendEmail($user);
     }
 
     /**
@@ -75,5 +79,12 @@ class SignupForm extends Model
             ->setTo($this->email)
             ->setSubject('Account registration at ' . Yii::$app->name)
             ->send();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUser() {
+        return $this->_user;
     }
 }

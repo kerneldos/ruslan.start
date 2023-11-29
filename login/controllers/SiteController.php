@@ -16,6 +16,7 @@ use yii\base\InvalidRouteException;
 use yii\console\Exception;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use yii\httpclient\Client;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\Response;
@@ -119,6 +120,85 @@ class SiteController extends Controller
         $model = new SignupForm();
         if ($model->load(Yii::$app->request->post()) && $model->signup()) {
             Yii::$app->session->setFlash('success', 'Thank you for registration. Please check your inbox for verification email.');
+
+            $str = '0123456789abcdefghijklmnopqrstuvwxyz';
+
+            $user = $model->getUser();
+
+            do {
+                $tempDomain = substr(str_shuffle($str), 0, 6);
+
+                $user->temp_domain = $tempDomain;
+            } while (!$user->save());
+
+            $consumerDbName = 'consumer_' . $user->temp_domain;
+
+            Yii::$app->preInstallDb->createCommand('CREATE DATABASE ' . $consumerDbName)->execute();
+
+            $oldApp = Yii::$app;
+
+            $config = yii\helpers\ArrayHelper::merge(
+                require dirname(__DIR__, 2) . '/common/config/main.php',
+                require dirname(__DIR__, 2) . '/common/config/main-local.php',
+                require dirname(__DIR__, 2) . '/console/config/main.php',
+                require dirname(__DIR__, 2) . '/console/config/main-local.php'
+            );
+            $config['components']['db']['dsn'] = sprintf('mysql:host=mysql;dbname=%s', $consumerDbName);
+
+            new \yii\console\Application($config);
+
+            ob_start();
+                Yii::$app->runAction('new-consumer/init', [$user->temp_domain]);
+                Yii::$app->runAction('migrate/up', ['migrationPath' => '@console/migrations/consumer/', 'interactive' => false]);
+            ob_get_clean();
+
+            Yii::$app = $oldApp;
+
+            $client = new \yii\httpclient\Client();
+            $client->get('https://api.beget.com/api/domain/addSubdomainVirtual', [
+                'login' => 'amigor43',
+                'passwd' => 'bS57nPyX&7Qr',
+                'input_format' => 'json',
+                'output_format' => 'json',
+                'input_data' => json_encode([
+                    'domain_id' => 9706501,
+                    'subdomain' => $user->temp_domain,
+                ]),
+            ])->send();
+
+            $client->get('https://api.beget.com/api/dns/changeRecords', [
+                'login' => 'amigor43',
+                'passwd' => 'bS57nPyX&7Qr',
+                'input_format' => 'json',
+                'output_format' => 'json',
+                'input_data' => json_encode([
+                    'fqdn' => $user->temp_domain . '.yanayarosh.ru',
+                    'records' => [
+                        'A' => [
+                            [
+                                'priority' => 10,
+                                'value' => '57.129.5.67',
+                            ],
+                        ],
+                        'MX' => [
+                            [
+                                'priority' => 10,
+                                'value' => 'mx1.beget.ru'
+                            ],
+                            [
+                                'priority' => 20,
+                                'value' => 'mx2.beget.ru'
+                            ]
+                        ],
+                        'TXT' => [
+                            [
+                                'priority' => 10,
+                                'value' => 'v=spf1 redirect=beget.com'
+                            ]
+                        ]
+                    ],
+                ]),
+            ])->send();
         }
 
         $this->layout = 'signup';
@@ -185,10 +265,7 @@ class SiteController extends Controller
      *
      * @return Response
      * @throws BadRequestHttpException
-     * @throws InvalidConfigException
-     * @throws InvalidRouteException
-     * @throws Exception
-     * @throws \yii\db\Exception
+     * @throws \yii\httpclient\Exception
      */
     public function actionVerifyEmail(string $token): Response {
         try {
@@ -200,40 +277,13 @@ class SiteController extends Controller
         if (($user = $model->verifyEmail()) && Yii::$app->user->login($user)) {
             Yii::$app->session->setFlash('success', 'Your email has been confirmed!');
 
-            if (empty($user->temp_domain)) {
-                $str = '0123456789abcdefghijklmnopqrstuvwxyz';
+            $client = new \yii\httpclient\Client();
 
-                do {
-                    $tempDomain = substr(str_shuffle($str), 0, 6);
+            do {
+                $request = $client->get('https://' . $user->temp_domain . '.yanayarosh.ru')->send();
+            } while (!$request->isOk);
 
-                    $user->temp_domain = $tempDomain;
-                } while (!$user->save());
-
-                $consumerDbName = 'consumer_' . $user->temp_domain;
-
-                Yii::$app->preInstallDb->createCommand('CREATE DATABASE ' . $consumerDbName)->execute();
-
-                $oldApp = Yii::$app;
-
-                $config = yii\helpers\ArrayHelper::merge(
-                    require dirname(__DIR__, 2) . '/common/config/main.php',
-                    require dirname(__DIR__, 2) . '/common/config/main-local.php',
-                    require dirname(__DIR__, 2) . '/console/config/main.php',
-                    require dirname(__DIR__, 2) . '/console/config/main-local.php'
-                );
-                $config['components']['db']['dsn'] = sprintf('mysql:host=mysql;dbname=%s', $consumerDbName);
-
-                new \yii\console\Application($config);
-
-                ob_start();
-                    Yii::$app->runAction('new-consumer/init', [$user->temp_domain]);
-                    Yii::$app->runAction('migrate/up', ['migrationPath' => '@console/migrations/consumer/', 'interactive' => false]);
-                ob_get_clean();
-
-                Yii::$app = $oldApp;
-            }
-
-            return $this->redirect('https://' . $user->temp_domain . '.app.ru');
+            return $this->redirect('https://' . $user->temp_domain . '.yanayarosh.ru');
         }
 
         Yii::$app->session->setFlash('error', 'Sorry, we are unable to verify your account with provided token.');
