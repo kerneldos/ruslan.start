@@ -9,6 +9,7 @@ use consumer\models\Tag;
 use Throwable;
 use Yii;
 use yii\base\BaseObject;
+use yii\base\InvalidConfigException;
 use yii\httpclient\Client;
 use yii\queue\JobInterface;
 
@@ -21,8 +22,12 @@ class SambaFileJob extends BaseObject implements JobInterface {
      * @param $queue
      *
      * @return void
+     * @throws InvalidConfigException
      */
     public function execute($queue) {
+        $config = require_once dirname(__DIR__, 2) . '/config/client/' . $this->consumer . '.php';
+        Yii::$app->set('db', $config['components']['db']);
+
         Document::$consumer = $this->consumer;
 
         $existsDocument = Document::findOne(['md5' => $this->document->md5, 'type' => $this->document->type]);

@@ -8,6 +8,7 @@ use consumer\models\Document;
 use Yii;
 use yii\authclient\OAuth2;
 use yii\base\BaseObject;
+use yii\base\InvalidConfigException;
 use yii\queue\JobInterface;
 
 class YandexIndexingJob extends BaseObject implements JobInterface {
@@ -19,8 +20,12 @@ class YandexIndexingJob extends BaseObject implements JobInterface {
      * @param $queue
      *
      * @return void
+     * @throws InvalidConfigException
      */
     public function execute($queue) {
+        $config = require_once dirname(__DIR__, 2) . '/config/client/' . $this->consumer . '.php';
+        Yii::$app->set('db', $config['components']['db']);
+
         $rootCategory = Category::findOne(['name' => Yandex::CATEGORY_NAME, 'parent_id' => 0]);
         if (empty($rootCategory)) {
             $rootCategory = new Category(['name' => Yandex::CATEGORY_NAME]);
