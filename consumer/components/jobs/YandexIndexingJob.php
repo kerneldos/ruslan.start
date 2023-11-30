@@ -25,6 +25,7 @@ class YandexIndexingJob extends BaseObject implements JobInterface {
     public function execute($queue) {
         $config = require_once dirname(__DIR__, 2) . '/config/client/' . $this->consumer . '.php';
         Yii::$app->set('db', $config['components']['db']);
+        Yii::$app->params = array_merge(Yii::$app->params, $config['params']);
 
         $rootCategory = Category::findOne(['name' => Yandex::CATEGORY_NAME, 'parent_id' => 0]);
         if (empty($rootCategory)) {
