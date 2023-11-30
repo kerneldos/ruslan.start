@@ -13,8 +13,8 @@ class Yandex extends \yii\authclient\clients\Yandex implements ServiceInterface 
 
     const CATEGORY_NAME = 'Yandex Диск';
 
-//    public $returnUrl = 'https://%s.yanayarosh.ru/site/get-token?service=yandex';
-    const RETURN_URL = 'https://%s.app.ru/site/get-token?service=yandex';
+//    const RETURN_URL = 'https://%s.app.ru/site/get-token?service=yandex';
+    const RETURN_URL = 'https://%s.yanayarosh.ru/site/get-token?service=yandex';
 
     /**
      * @param string $consumer
