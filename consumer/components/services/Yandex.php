@@ -13,8 +13,8 @@ class Yandex extends \yii\authclient\clients\Yandex implements ServiceInterface 
 
     const CATEGORY_NAME = 'Yandex Диск';
 
-    const RETURN_URL = 'https://menq6k.app.ru/site/get-token?service=yandex';
-//    const RETURN_URL = 'https://127.0.0.1/site/get-token?service=yandex';
+//    public $returnUrl = 'https://%s.yanayarosh.ru/site/get-token?service=yandex';
+    const RETURN_URL = 'https://%s.app.ru/site/get-token?service=yandex';
 
     /**
      * @param string $consumer
@@ -46,7 +46,7 @@ class Yandex extends \yii\authclient\clients\Yandex implements ServiceInterface 
 
         $this->clientId     = $clientId->value;
         $this->clientSecret = $clientSecret->value;
-        $this->returnUrl    = self::RETURN_URL;
+        $this->returnUrl    = sprintf(self::RETURN_URL, Yii::$app->params['subDomain']);
 
         $this->stateStorage = 'consumer\components\services\DbStateStorage';
     }

@@ -32,50 +32,52 @@ class CheckFreeDomainsController extends Controller {
                     $domain->updated_at = $time;
                 } while (!$domain->save());
 
-                $client->get('https://api.beget.com/api/domain/addSubdomainVirtual', [
-                    'login' => Yii::$app->params['beget_login'],
-                    'passwd' => Yii::$app->params['beget_password'],
-                    'input_format' => 'json',
-                    'output_format' => 'json',
-                    'input_data' => json_encode([
-                        'domain_id' => 9706501,
-                        'subdomain' => $domain->temp_name,
-                    ]),
-                ])->send();
+                if (!empty(Yii::$app->params['beget_login']) && !empty(Yii::$app->params['beget_password'])) {
+                    $client->get('https://api.beget.com/api/domain/addSubdomainVirtual', [
+                        'login' => Yii::$app->params['beget_login'],
+                        'passwd' => Yii::$app->params['beget_password'],
+                        'input_format' => 'json',
+                        'output_format' => 'json',
+                        'input_data' => json_encode([
+                            'domain_id' => 9706501,
+                            'subdomain' => $domain->temp_name,
+                        ]),
+                    ])->send();
 
-                $client->get('https://api.beget.com/api/dns/changeRecords', [
-                    'login' => Yii::$app->params['beget_login'],
-                    'passwd' => Yii::$app->params['beget_password'],
-                    'input_format' => 'json',
-                    'output_format' => 'json',
-                    'input_data' => json_encode([
-                        'fqdn' => $domain->temp_name . '.' . Yii::$app->params['main_domain'],
-                        'records' => [
-                            'A' => [
-                                [
-                                    'priority' => 10,
-                                    'value' => '57.129.5.67',
+                    $client->get('https://api.beget.com/api/dns/changeRecords', [
+                        'login' => Yii::$app->params['beget_login'],
+                        'passwd' => Yii::$app->params['beget_password'],
+                        'input_format' => 'json',
+                        'output_format' => 'json',
+                        'input_data' => json_encode([
+                            'fqdn' => $domain->temp_name . '.' . Yii::$app->params['main_domain'],
+                            'records' => [
+                                'A' => [
+                                    [
+                                        'priority' => 10,
+                                        'value' => '57.129.5.67',
+                                    ],
                                 ],
-                            ],
-                            'MX' => [
-                                [
-                                    'priority' => 10,
-                                    'value' => 'mx1.beget.ru'
+                                'MX' => [
+                                    [
+                                        'priority' => 10,
+                                        'value' => 'mx1.beget.ru'
+                                    ],
+                                    [
+                                        'priority' => 20,
+                                        'value' => 'mx2.beget.ru'
+                                    ]
                                 ],
-                                [
-                                    'priority' => 20,
-                                    'value' => 'mx2.beget.ru'
+                                'TXT' => [
+                                    [
+                                        'priority' => 10,
+                                        'value' => 'v=spf1 redirect=beget.com'
+                                    ]
                                 ]
                             ],
-                            'TXT' => [
-                                [
-                                    'priority' => 10,
-                                    'value' => 'v=spf1 redirect=beget.com'
-                                ]
-                            ]
-                        ],
-                    ]),
-                ])->send();
+                        ]),
+                    ])->send();
+                }
             }
         }
     }

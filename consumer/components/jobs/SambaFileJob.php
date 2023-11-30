@@ -75,47 +75,47 @@ class SambaFileJob extends BaseObject implements JobInterface {
 //                $this->document->tags = $documentTags;
 //            }
 
-//            try {
-//                $client = new Client([
-//                    'requestConfig' => [
-//                        'format' => Client::FORMAT_JSON,
-//                    ],
-//                    'baseUrl' => 'http://ai/',
-//                ]);
-//
-//                $request = $client->post('get_category', ['content' => base64_encode($content)]);
-//
-//                $response = $request->send();
-//                if (!empty($response->data['category'])) {
-//                    $aiCategory = AiCategory::findOne(['name' => $response->data['category']]);
-//                    if (empty($aiCategory)) {
-//                        $aiCategory = new AiCategory(['name' => $response->data['category']]);
-//                        $aiCategory->save();
-//                    }
-//
-//                    $aiCategoryId = $aiCategory->id;
-//                    if (!empty($response->data['subcategory'])) {
-//                        $subCategory = AiCategory::findOne([
-//                            'name' => $response->data['subcategory'],
-//                            'parent_id' => $aiCategory->id,
-//                        ]);
-//
-//                        if (empty($subCategory)) {
-//                            $subCategory = new AiCategory([
-//                                'name' => $response->data['subcategory'],
-//                                'parent_id' => $aiCategory->id,
-//                            ]);
-//                            $subCategory->save();
-//                        }
-//
-//                        $aiCategoryId = $subCategory->id;
-//                    }
-//
-//                    $this->document->ai_category = $aiCategoryId;
-//                }
-//            } catch (\Throwable $exception) {
-//                file_put_contents(Yii::getAlias('/tmp/insert.log'), print_r($exception->getMessage(), true), FILE_APPEND);
-//            }
+            try {
+                $client = new Client([
+                    'requestConfig' => [
+                        'format' => Client::FORMAT_JSON,
+                    ],
+                    'baseUrl' => 'http://ai/',
+                ]);
+
+                $request = $client->post('get_category', ['content' => base64_encode($content)]);
+
+                $response = $request->send();
+                if (!empty($response->data['category'])) {
+                    $aiCategory = AiCategory::findOne(['name' => $response->data['category']]);
+                    if (empty($aiCategory)) {
+                        $aiCategory = new AiCategory(['name' => $response->data['category']]);
+                        $aiCategory->save();
+                    }
+
+                    $aiCategoryId = $aiCategory->id;
+                    if (!empty($response->data['subcategory'])) {
+                        $subCategory = AiCategory::findOne([
+                            'name' => $response->data['subcategory'],
+                            'parent_id' => $aiCategory->id,
+                        ]);
+
+                        if (empty($subCategory)) {
+                            $subCategory = new AiCategory([
+                                'name' => $response->data['subcategory'],
+                                'parent_id' => $aiCategory->id,
+                            ]);
+                            $subCategory->save();
+                        }
+
+                        $aiCategoryId = $subCategory->id;
+                    }
+
+                    $this->document->ai_category = $aiCategoryId;
+                }
+            } catch (\Throwable $exception) {
+                file_put_contents(Yii::getAlias('/tmp/insert.log'), print_r($exception->getMessage(), true), FILE_APPEND);
+            }
 
             $this->document->save();
         }

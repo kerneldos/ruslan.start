@@ -11,4 +11,7 @@ return [
             'charset' => 'utf8',
         ],
     ],
+    'params' => [
+        'subDomain' => '<?= $consumer ?>',
+    ],
 ];

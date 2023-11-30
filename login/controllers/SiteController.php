@@ -157,12 +157,13 @@ class SiteController extends Controller
                 require dirname(__DIR__, 2) . '/console/config/main-local.php'
             );
             $config['components']['db']['dsn'] = sprintf('mysql:host=mysql;dbname=%s', $consumerDbName);
+            $config['params']['subDomain'] = $user->temp_domain;
 
             new Application($config);
 
             ob_start();
-                Yii::$app->runAction('new-consumer/init', [$user->temp_domain]);
                 Yii::$app->runAction('migrate/up', ['migrationPath' => '@console/migrations/consumer/', 'interactive' => false]);
+                Yii::$app->runAction('new-consumer/init', [$user->temp_domain]);
             ob_get_clean();
 
             Yii::$app = $oldApp;
