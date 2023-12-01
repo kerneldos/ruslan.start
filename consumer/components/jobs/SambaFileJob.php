@@ -27,8 +27,7 @@ class SambaFileJob extends BaseObject implements JobInterface {
     public function execute($queue) {
         $config = require_once dirname(__DIR__, 2) . '/config/client/' . $this->consumer . '.php';
         Yii::$app->set('db', $config['components']['db']);
-
-        Document::$consumer = $this->consumer;
+        Yii::$app->params = array_merge(Yii::$app->params, $config['params']);
 
         $existsDocument = Document::findOne(['md5' => $this->document->md5, 'type' => $this->document->type]);
 
@@ -49,8 +48,8 @@ class SambaFileJob extends BaseObject implements JobInterface {
 
             $this->document->content = $content;
 
-            $documentTags = [];
-
+//            $documentTags = [];
+//
 //            $tags = Tag::find()->all();
 //            if (!empty($tags)) {
 //                /** @var Tag $tag */

@@ -92,19 +92,6 @@ class Document extends ActiveRecord
         'application/x-7z-compressed' => self::TYPE_ARCHIVE,
     ];
 
-    public static string $consumer;
-
-    /**
-     * @return void
-     */
-    public function init() {
-        parent::init();
-
-        if (empty(self::$consumer)) {
-            self::$consumer = Yii::$app->user->identity->temp_domain;
-        }
-    }
-
     /**
      * @param string $mimeType
      *
@@ -260,6 +247,6 @@ class Document extends ActiveRecord
     public static function index(): string {
         $index = parent::index();
 
-        return $index . '_' . self::$consumer;
+        return $index . '_' . Yii::$app->params['subDomain'];
     }
 }

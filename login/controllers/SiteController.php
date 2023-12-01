@@ -118,11 +118,6 @@ class SiteController extends Controller
 
     /**
      * @return string
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws InvalidRouteException
-     * @throws \yii\db\Exception
-     * @throws \yii\httpclient\Exception
      * @throws NotFoundHttpException
      */
     public function actionSignup(): string {
@@ -143,30 +138,6 @@ class SiteController extends Controller
             } else {
                 throw new NotFoundHttpException('Server Error');
             }
-
-            $consumerDbName = 'consumer_' . $user->temp_domain;
-
-            Yii::$app->preInstallDb->createCommand('CREATE DATABASE ' . $consumerDbName)->execute();
-
-            $oldApp = Yii::$app;
-
-            $config = yii\helpers\ArrayHelper::merge(
-                require dirname(__DIR__, 2) . '/common/config/main.php',
-                require dirname(__DIR__, 2) . '/common/config/main-local.php',
-                require dirname(__DIR__, 2) . '/console/config/main.php',
-                require dirname(__DIR__, 2) . '/console/config/main-local.php'
-            );
-            $config['components']['db']['dsn'] = sprintf('mysql:host=mysql;dbname=%s', $consumerDbName);
-            $config['params']['subDomain'] = $user->temp_domain;
-
-            new Application($config);
-
-            ob_start();
-                Yii::$app->runAction('migrate/up', ['migrationPath' => '@console/migrations/consumer/', 'interactive' => false]);
-                Yii::$app->runAction('new-consumer/init', [$user->temp_domain]);
-            ob_get_clean();
-
-            Yii::$app = $oldApp;
         }
 
         $this->layout = 'signup';

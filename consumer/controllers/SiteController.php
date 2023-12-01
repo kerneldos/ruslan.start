@@ -26,23 +26,6 @@ use consumer\models\ContactForm;
 class SiteController extends BaseController
 {
     /**
-     * @return void
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
-    public function init() {
-        parent::init();
-
-        if (!Yii::$app->user->isGuest) {
-            Document::$consumer = Yii::$app->user->identity->temp_domain;
-
-            if (!Yii::$app->elasticsearch->createCommand()->indexExists(Document::index())) {
-                Document::createIndex();
-            }
-        }
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function behaviors(): array {
@@ -106,7 +89,6 @@ class SiteController extends BaseController
     /**
      * @return string|Response
      * @throws Exception
-     * @throws InvalidConfigException
      */
     public function actionIndex() {
         if (Yii::$app->request->isAjax) {
