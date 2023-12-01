@@ -87,7 +87,10 @@ class SambaFileJob extends BaseObject implements JobInterface {
                     'baseUrl' => 'http://ai/',
                 ]);
 
-                $request = $client->post('get_category', ['content' => base64_encode($content)]);
+                $request = $client->post('get_category', [
+                    'content' => base64_encode($content),
+                    'document_name' => $this->document->name,
+                ]);
 
                 $response = $request->send();
                 if (!empty($response->data['category'])) {
