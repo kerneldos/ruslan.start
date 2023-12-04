@@ -7,7 +7,6 @@ use yii\base\Model;
 
 /**
  * Login form
- * @property string $redirectUrl
  */
 class LoginForm extends Model
 {
@@ -73,12 +72,5 @@ class LoginForm extends Model
         }
 
         return $this->_user;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRedirectUrl(): string {
-        return $this->getUser()->temp_domain;
     }
 }

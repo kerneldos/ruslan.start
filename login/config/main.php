@@ -9,13 +9,17 @@ $params = array_merge(
 return [
     'id' => 'app-login',
     'basePath' => dirname(__DIR__),
-    'controllerNamespace' => 'login\controllers',
+    'defaultRoute' => 'main/default/login',
     'bootstrap' => ['log'],
-    'modules' => [],
+    'modules' => [
+        'main' => [
+            'class' => 'login\modules\main\Module',
+        ],
+    ],
     'components' => [
         'request' => [
             'baseUrl' => '',
-//            'csrfParam' => '_csrf-login',
+            'csrfParam' => '_csrf-login',
         ],
         'user' => [
             'identityClass' => 'common\models\User',
@@ -38,7 +42,7 @@ return [
             ],
         ],
         'errorHandler' => [
-            'errorAction' => 'site/error',
+            'errorAction' => 'main/default/error',
         ],
         'urlManager' => [
             'enablePrettyUrl' => true,
@@ -48,10 +52,11 @@ return [
                 'action' => yii\web\UrlNormalizer::ACTION_REDIRECT_TEMPORARY,
             ],
             'rules' => [
-                '' => 'site/login',
-                '<_a:login|logout|signup>' => 'site/<_a>',
-                '<_c>' => '<_c>/index',
-                '<_c>/<_a>' => '<_c>/<_a>',
+//                '' => 'main/default/index',
+                '<_a:login|logout|signup>' => 'main/default/<_a>',
+                '<_m>' => '<_m>/default/index',
+                '<_m>/<_c>' => '<_m>/<_c>/index',
+                '<_m>/<_c>/<_a>' => '<_m>/<_c>/<_a>',
             ],
         ],
     ],

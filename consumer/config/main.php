@@ -14,7 +14,7 @@ return [
     'components' => [
         'request' => [
             'baseUrl' => '',
-//            'csrfParam' => '_csrf-consumer',
+            'csrfParam' => '_csrf-consumer',
         ],
         'user' => [
             'identityClass' => 'common\models\User',

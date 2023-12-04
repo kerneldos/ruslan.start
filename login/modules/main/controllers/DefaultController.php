@@ -1,35 +1,26 @@
 <?php
 
-namespace login\controllers;
+namespace login\modules\main\controllers;
 
-use common\models\Domain;
 use common\models\LoginForm;
-use InvalidArgumentException;
+use common\models\Portal;
 use login\models\PasswordResetRequestForm;
 use login\models\ResendVerificationEmailForm;
 use login\models\ResetPasswordForm;
 use login\models\SignupForm;
 use login\models\VerifyEmailForm;
 use Yii;
-use yii\base\InvalidConfigException;
-use yii\base\InvalidRouteException;
-use yii\console\Application;
-use yii\console\Exception;
 use yii\filters\AccessControl;
-use yii\filters\VerbFilter;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
- * Site controller
+ * Default controller for the `main` module
  */
-class SiteController extends Controller
+class DefaultController extends Controller
 {
-    /**
-     * {@inheritdoc}
-     */
     public function behaviors(): array {
         return [
             'access' => [
@@ -45,12 +36,6 @@ class SiteController extends Controller
                         'allow' => true,
                         'roles' => ['@'],
                     ],
-                ],
-            ],
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => [
-                    'logout' => ['post'],
                 ],
             ],
         ];
@@ -71,7 +56,11 @@ class SiteController extends Controller
      * @return Response
      */
     public function actionIndex(): Response {
-        $redirectUrl = sprintf('https://%s.%s', Yii::$app->user->identity->temp_domain, Yii::$app->params['main_domain']);
+        $userPortals = Yii::$app->user->identity->portals;
+
+        /** @var Portal $userPortal */
+        $userPortal  = reset($userPortals);
+        $redirectUrl = sprintf('https://%s.%s', $userPortal->temp_name, Yii::$app->params['main_domain']);
 
         return $this->redirect($redirectUrl);
     }
@@ -84,7 +73,11 @@ class SiteController extends Controller
     public function actionLogin()
     {
         if (!Yii::$app->user->isGuest) {
-            $redirectUrl = sprintf('https://%s.%s', Yii::$app->user->identity->temp_domain, Yii::$app->params['main_domain']);
+            $userPortals = Yii::$app->user->identity->portals;
+
+            /** @var Portal $userPortal */
+            $userPortal  = reset($userPortals);
+            $redirectUrl = sprintf('https://%s.%s', $userPortal->temp_name, Yii::$app->params['main_domain']);
 
             return $this->redirect($redirectUrl);
         }
@@ -93,7 +86,11 @@ class SiteController extends Controller
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            $redirectUrl = sprintf('https://%s.%s', $model->redirectUrl, Yii::$app->params['main_domain']);
+            $userPortals = Yii::$app->user->identity->portals;
+
+            /** @var Portal $userPortal */
+            $userPortal  = reset($userPortals);
+            $redirectUrl = sprintf('https://%s.%s', $userPortal->temp_name, Yii::$app->params['main_domain']);
 
             return $this->redirect($redirectUrl);
         }
@@ -127,14 +124,10 @@ class SiteController extends Controller
 
             $user = $model->getUser();
 
-            $domain = Domain::findOne(['user_id' => null]);
-            if (!empty($domain)) {
-                $domain->user_id = $user->id;
-
-                if ($domain->save()) {
-                    $user->temp_domain = $domain->temp_name;
-                    $user->save();
-                }
+            $portal = Portal::findOne(['user_id' => null]);
+            if (!empty($portal)) {
+                $user->portals = [$portal->id];
+                $user->save();
             } else {
                 throw new NotFoundHttpException('Server Error');
             }
@@ -215,9 +208,15 @@ class SiteController extends Controller
         if (($user = $model->verifyEmail()) && Yii::$app->user->login($user)) {
             Yii::$app->session->setFlash('success', 'Your email has been confirmed!');
 
-            $redirectUrl = sprintf('https://%s.%s', $user->temp_domain, Yii::$app->params['main_domain']);
+            if (count($user->portals) == 1) {
+                $userPortals = $user->portals;
 
-            return $this->redirect($redirectUrl);
+                /** @var Portal $userPortal */
+                $userPortal  = reset($userPortals);
+                $redirectUrl = sprintf('https://%s.%s', $userPortal->temp_name, Yii::$app->params['main_domain']);
+
+                return $this->redirect($redirectUrl);
+            }
         }
 
         Yii::$app->session->setFlash('error', 'Sorry, we are unable to verify your account with provided token.');

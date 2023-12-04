@@ -2,7 +2,7 @@
 
 namespace console\controllers;
 
-use common\models\Domain;
+use common\models\Portal;
 use consumer\models\Document;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -11,7 +11,7 @@ use yii\console\Controller;
 use yii\httpclient\Client;
 use yii\httpclient\Exception;
 
-class CheckFreeDomainsController extends Controller {
+class CheckFreePortalsController extends Controller {
     /**
      * @return void
      * @throws Exception
@@ -21,27 +21,23 @@ class CheckFreeDomainsController extends Controller {
      * @throws \yii\db\Exception
      */
     public function actionIndex() {
-        $freeDomainsCount = Domain::find()->where(['user_id' => null])->count();
+        $freePortalsCount = Portal::find()->where(['user_id' => null])->count();
 
-        if ($freeDomainsCount < 5) {
+        if ($freePortalsCount < 5) {
             $str = '0123456789abcdefghijklmnopqrstuvwxyz';
 
             $httpClient = new Client();
 
             $commonConfig = require dirname(__DIR__, 2) . '/common/config/main-local.php';
 
-            for ($i = $freeDomainsCount; $i < 5; $i++) {
+            for ($i = $freePortalsCount; $i < 5; $i++) {
                 Yii::$app->set('db', $commonConfig['components']['db']);
 
-                $domain = new Domain();
+                $portal = new Portal();
 
                 do {
-                    $time = time();
-
-                    $domain->temp_name = substr(str_shuffle($str), 0, 6);
-                    $domain->created_at = $time;
-                    $domain->updated_at = $time;
-                } while (!$domain->save());
+                    $portal->temp_name = substr(str_shuffle($str), 0, 6);
+                } while (!$portal->save());
 
                 if (!empty(Yii::$app->params['beget_login']) && !empty(Yii::$app->params['beget_password'])) {
                     $httpClient->get('https://api.beget.com/api/domain/addSubdomainVirtual', [
@@ -51,7 +47,7 @@ class CheckFreeDomainsController extends Controller {
                         'output_format' => 'json',
                         'input_data' => json_encode([
                             'domain_id' => 9706501,
-                            'subdomain' => $domain->temp_name,
+                            'subdomain' => $portal->temp_name,
                         ]),
                     ])->send();
 
@@ -61,7 +57,7 @@ class CheckFreeDomainsController extends Controller {
                         'input_format' => 'json',
                         'output_format' => 'json',
                         'input_data' => json_encode([
-                            'fqdn' => $domain->temp_name . '.' . Yii::$app->params['main_domain'],
+                            'fqdn' => $portal->temp_name . '.' . Yii::$app->params['main_domain'],
                             'records' => [
                                 'A' => [
                                     [
@@ -90,15 +86,15 @@ class CheckFreeDomainsController extends Controller {
                     ])->send();
                 }
 
-                $consumerDbName = 'consumer_' . $domain->temp_name;
+                $consumerDbName = 'consumer_' . $portal->temp_name;
                 Yii::$app->preInstallDb->createCommand('CREATE DATABASE ' . $consumerDbName)->execute();
 
-                Yii::$app->runAction('new-consumer/init', [$domain->temp_name]);
+                Yii::$app->runAction('new-consumer/init', [$portal->temp_name]);
 
-                $consumerConfig = require dirname(__DIR__, 2) . '/consumer/config/client/' . $domain->temp_name . '.php';
+                $consumerConfig = require dirname(__DIR__, 2) . '/consumer/config/client/' . $portal->temp_name . '.php';
 
                 Yii::$app->set('db', $consumerConfig['components']['db']);
-                Yii::$app->params['subDomain'] = $domain->temp_name;
+                Yii::$app->params['subDomain'] = $portal->temp_name;
 
                 Yii::$app->runAction('migrate/up', ['migrationPath' => '@console/migrations/consumer/', 'interactive' => false]);
 

@@ -32,5 +32,10 @@ return [
             'driver' => \yii\queue\amqp_interop\Queue::ENQUEUE_AMQP_LIB,
             'dsn' => 'amqp:',
         ],
+        'authManager' => [
+            'class' => 'yii\rbac\DbManager',
+            'db' => 'loginDb',
+            'defaultRoles' => ['portal_member'],
+        ],
     ],
 ];

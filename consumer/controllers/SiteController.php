@@ -35,7 +35,11 @@ class SiteController extends BaseController
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => ['@'],
+                        'actions' => ['error'],
+                    ],
+                    [
+                        'allow' => true,
+                        'roles' => ['portal_member'],
                     ],
                     [
                         'allow' => true,
