@@ -25,7 +25,6 @@ use yii\web\IdentityInterface;
  * @property integer $created_at
  * @property integer $updated_at
  * @property string $password write-only password
- * @property string $temp_domain write-only password
  * @property Portal[] $portals
  */
 class User extends ActiveRecord implements IdentityInterface
@@ -63,7 +62,6 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules(): array {
         return [
             ['status', 'default', 'value' => self::STATUS_INACTIVE],
-            ['temp_domain', 'unique'],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_DELETED]],
         ];
     }
