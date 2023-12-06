@@ -19,7 +19,7 @@ return [
         'user' => [
             'identityClass' => 'common\models\User',
             'enableAutoLogin' => true,
-            'loginUrl' => 'https://login.app.ru',
+            'loginUrl' => 'https://login.yanayarosh.ru/',
             'identityCookie' => ['name' => '_identity-app', 'httpOnly' => true, 'domain' => '.app.ru'],
         ],
         'session' => [
