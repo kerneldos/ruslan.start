@@ -8,25 +8,26 @@ use login\models\PasswordResetRequestForm;
 use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Html;
 
-$this->title = 'Request password reset';
+$this->title = 'Please fill out your email. A link to reset password will be sent there.';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="site-request-password-reset">
-    <h1><?= Html::encode($this->title) ?></h1>
+<div class="site-request-password-reset card-body login-card-body">
+    <p><?= Html::encode($this->title) ?></p>
 
-    <p>Please fill out your email. A link to reset password will be sent there.</p>
-
-    <div class="row">
-        <div class="col-lg-5">
-            <?php $form = ActiveForm::begin(['id' => 'request-password-reset-form']); ?>
-
-                <?= $form->field($model, 'email')->textInput(['autofocus' => true]) ?>
-
-                <div class="form-group">
-                    <?= Html::submitButton('Send', ['class' => 'btn btn-primary']) ?>
+    <?php $form = ActiveForm::begin(['id' => 'request-password-reset-form']); ?>
+        <div class="row">
+            <div class="input-group mb-3 col-12">
+                <?= Html::activeTextInput($model, 'email', ['placeholder' => 'Email', 'class' => 'form-control']) ?>
+                <div class="input-group-append">
+                    <div class="input-group-text">
+                        <span class="fas fa-envelope"></span>
+                    </div>
                 </div>
+            </div>
 
-            <?php ActiveForm::end(); ?>
+            <div class="col-4">
+                <?= Html::submitButton('Send', ['class' => 'btn btn-primary']) ?>
+            </div>
         </div>
-    </div>
+    <?php ActiveForm::end(); ?>
 </div>
