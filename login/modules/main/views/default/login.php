@@ -36,7 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="row">
             <div class="col-8">
                 <div class="icheck-primary">
-                    <?= Html::activeCheckbox($model, 'rememberMe') ?>
+                    <?= Html::activeCheckbox($model, 'rememberMe', ['label' => false]) ?>
                     <label for="remember">
                         Remember Me
                     </label>
