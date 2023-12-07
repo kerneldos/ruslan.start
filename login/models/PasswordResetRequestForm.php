@@ -4,6 +4,7 @@ namespace login\models;
 
 use common\models\User;
 use Yii;
+use yii\base\Exception;
 use yii\base\Model;
 
 /**
@@ -34,6 +35,7 @@ class PasswordResetRequestForm extends Model
      * Sends an email with a link, for resetting the password.
      *
      * @return bool whether the email was send
+     * @throws Exception
      */
     public function sendEmail(): bool {
         /* @var $user User */
