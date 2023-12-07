@@ -51,7 +51,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php ActiveForm::end(); ?>
 
     <p class="mb-1">
-        <?= Html::a('I forgot my password', Url::to(['main/default/request-password-reset'])) ?>
+        <?= Html::a('I forgot my password', Url::to(['request-password-reset'])) ?>
     </p>
     <p class="mb-0">
         <a href="/signup" class="text-center">Register a new membership</a>
