@@ -85,7 +85,7 @@ class SiteController extends BaseController
             return $this->redirect($client->buildAuthUrl());
         }
 
-        $client->indexing(Yii::$app->user->identity->temp_domain);
+        $client->indexing(Yii::$app->params['subDomain']);
 
         return $this->redirect('index');
     }
