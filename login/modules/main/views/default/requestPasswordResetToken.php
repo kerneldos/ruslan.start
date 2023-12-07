@@ -32,5 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     <?php ActiveForm::end(); ?>
 
-    <?= Html::a('Go to Login Page', Url::to(['login'], ['class' => 'text-center'])) ?>
+    <p>
+        <?= Html::a('Go to Login Page', Url::to(['login'], ['class' => 'text-center'])) ?>
+    </p>
 </div>
