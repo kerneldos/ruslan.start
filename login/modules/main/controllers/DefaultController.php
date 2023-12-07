@@ -158,6 +158,8 @@ class DefaultController extends Controller
             Yii::$app->session->setFlash('error', 'Sorry, we are unable to reset password for the provided email address.');
         }
 
+        $this->layout = 'login';
+
         return $this->render('requestPasswordResetToken', [
             'model' => $model,
         ]);
@@ -184,6 +186,8 @@ class DefaultController extends Controller
 
             return $this->goHome();
         }
+
+        $this->layout = 'login';
 
         return $this->render('resetPassword', [
             'model' => $model,
@@ -239,6 +243,8 @@ class DefaultController extends Controller
             }
             Yii::$app->session->setFlash('error', 'Sorry, we are unable to resend verification email for the provided email address.');
         }
+
+        $this->layout = 'login';
 
         return $this->render('resendVerificationEmail', [
             'model' => $model

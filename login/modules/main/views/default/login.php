@@ -6,6 +6,7 @@
 
 use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Html;
+use yii\helpers\Url;
 
 $this->title = 'Login';
 $this->params['breadcrumbs'][] = $this->title;
@@ -17,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'id' => 'login-form',
     ]); ?>
         <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="Login" name="LoginForm[username]">
+            <?= Html::activeTextInput($model, 'username', ['placeholder' => 'Login', 'class' => 'form-control']) ?>
             <div class="input-group-append">
                 <div class="input-group-text">
                     <span class="fas fa-envelope"></span>
@@ -25,7 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
         </div>
         <div class="input-group mb-3">
-            <input type="password" class="form-control" placeholder="Password" name="LoginForm[password]">
+            <?= Html::activePasswordInput($model, 'password', ['placeholder' => 'Password', 'class' => 'form-control']) ?>
             <div class="input-group-append">
                 <div class="input-group-text">
                     <span class="fas fa-lock"></span>
@@ -35,7 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="row">
             <div class="col-8">
                 <div class="icheck-primary">
-                    <input type="checkbox" id="remember" name="LoginForm[rememberMe]">
+                    <?= Html::activeCheckbox($model, 'rememberMe') ?>
                     <label for="remember">
                         Remember Me
                     </label>
@@ -50,7 +51,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php ActiveForm::end(); ?>
 
     <p class="mb-1">
-        <a href="/">I forgot my password</a>
+        <?= Html::a('I forgot my password', Url::to(['main/default/request-password-reset'])) ?>
     </p>
     <p class="mb-0">
         <a href="/signup" class="text-center">Register a new membership</a>
