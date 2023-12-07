@@ -7,38 +7,41 @@
 use login\models\SignupForm;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
+use yii\helpers\Url;
 
-$this->title = 'Signup';
+$this->title = 'Register a new membership';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="card-body register-card-body">
-    <p class="login-box-msg">Register a new membership</p>
+    <p><?= Html::encode($this->title) ?></p>
 
     <?php $form = ActiveForm::begin(['id' => 'form-signup']); ?>
-        <div class="input-group mb-3">
-            <?= Html::activeInput('text', $model, 'username', ['class' => 'form-control', 'placeholder' => 'Login']) ?>
+        <div class="row">
+            <div class="input-group mb-3 col-12">
+                <?= Html::activeInput('text', $model, 'username', ['class' => 'form-control', 'placeholder' => 'Login']) ?>
 
-            <div class="input-group-append">
-                <div class="input-group-text">
-                    <span class="fas fa-user"></span>
+                <div class="input-group-append">
+                    <div class="input-group-text">
+                        <span class="fas fa-user"></span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="input-group mb-3">
-            <?= Html::activeInput('email', $model, 'email', ['class' => 'form-control', 'placeholder' => 'Email']) ?>
+            <div class="input-group mb-3 col-12">
+                <?= Html::activeInput('email', $model, 'email', ['class' => 'form-control', 'placeholder' => 'Email']) ?>
 
-            <div class="input-group-append">
-                <div class="input-group-text">
-                    <span class="fas fa-envelope"></span>
+                <div class="input-group-append">
+                    <div class="input-group-text">
+                        <span class="fas fa-envelope"></span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="input-group mb-3">
-            <?= Html::activeInput('password', $model, 'password', ['class' => 'form-control', 'placeholder' => 'Password']) ?>
+            <div class="input-group mb-3 col-12">
+                <?= Html::activeInput('password', $model, 'password', ['class' => 'form-control', 'placeholder' => 'Password']) ?>
 
-            <div class="input-group-append">
-                <div class="input-group-text">
-                    <span class="fas fa-lock"></span>
+                <div class="input-group-append">
+                    <div class="input-group-text">
+                        <span class="fas fa-lock"></span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -72,5 +75,5 @@ $this->params['breadcrumbs'][] = $this->title;
         </a>
     </div>
 
-    <a href="/" class="text-center">I already have a membership</a>
+    <?= Html::a('I already have a membership', Url::to(['login'], ['class' => 'text-center'])) ?>
 </div>

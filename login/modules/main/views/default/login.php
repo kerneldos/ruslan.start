@@ -8,11 +8,11 @@ use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Html;
 use yii\helpers\Url;
 
-$this->title = 'Login';
+$this->title = 'Sign in to start your session';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="card-body login-card-body">
-    <p class="login-box-msg">Sign in to start your session</p>
+    <p><?= Html::encode($this->title) ?></p>
 
     <?php $form = ActiveForm::begin(['id' => 'login-form']); ?>
         <div class="row">

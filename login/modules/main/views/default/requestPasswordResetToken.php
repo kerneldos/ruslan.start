@@ -7,6 +7,7 @@
 use login\models\PasswordResetRequestForm;
 use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Html;
+use yii\helpers\Url;
 
 $this->title = 'Please fill out your email. A link to reset password will be sent there.';
 $this->params['breadcrumbs'][] = $this->title;
@@ -30,4 +31,6 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
         </div>
     <?php ActiveForm::end(); ?>
+
+    <?= Html::a('Go to Login Page', Url::to(['login'], ['class' => 'text-center'])) ?>
 </div>
