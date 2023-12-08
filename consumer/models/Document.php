@@ -120,7 +120,7 @@ class Document extends ActiveRecord
             // Типы полей: https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#field-datatypes
             'properties' => [
                 'name'        => ['type' => 'text', 'fielddata' => 'true'],
-                'content'     => ['type' => 'text', 'analyzer' => 'standard'],
+                'content'     => ['type' => 'text', 'analyzer' => 'standard', 'term_vector' => 'with_positions_offsets'],
                 'created'     => ['type' => 'date'],
                 'mime_type'   => ['type' => 'text'],
                 'file'        => ['type' => 'text'],
