@@ -25,7 +25,7 @@ class DocumentSearch extends Document
         $query = Document::find()->highlight([
             'pre_tags' => ['<strong>'],  //default is <em>
             'post_tags' => ['</strong>'],
-            'fields' => ['attachment.content' => new stdClass(), 'content' => new stdClass()],
+            'fields' => ['content' => new stdClass()],
         ]);
 
         $dataProvider = new ActiveDataProvider([
