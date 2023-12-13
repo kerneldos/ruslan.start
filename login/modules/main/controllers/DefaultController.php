@@ -10,6 +10,7 @@ use login\models\ResetPasswordForm;
 use login\models\SignupForm;
 use login\models\VerifyEmailForm;
 use Yii;
+use yii\base\Exception;
 use yii\filters\AccessControl;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
@@ -48,6 +49,7 @@ class DefaultController extends Controller
         return [
             'error' => [
                 'class' => \yii\web\ErrorAction::class,
+                'layout' => 'main',
             ],
         ];
     }
@@ -115,7 +117,7 @@ class DefaultController extends Controller
 
     /**
      * @return string
-     * @throws NotFoundHttpException
+     * @throws NotFoundHttpException|Exception
      */
     public function actionSignup(): string {
         $model = new SignupForm();
@@ -144,6 +146,7 @@ class DefaultController extends Controller
      * Requests password reset.
      *
      * @return Response|string
+     * @throws Exception
      */
     public function actionRequestPasswordReset()
     {
