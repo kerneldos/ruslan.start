@@ -89,7 +89,7 @@ class SambaFileJob extends BaseObject implements JobInterface {
 
                 $request = $client->post('get_category', [
                     'content' => base64_encode($content),
-                    'document_name' => $this->document->name,
+                    'filename' => $this->document->name,
                 ]);
 
                 $response = $request->send();
