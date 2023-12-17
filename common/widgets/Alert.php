@@ -60,14 +60,14 @@ class Alert extends \yii\bootstrap\Widget
             }
 
             foreach ((array) $flash as $i => $message) {
-                echo \yii\bootstrap\Alert::widget([
-                    'body' => $message,
-                    'closeButton' => $this->closeButton,
-                    'options' => array_merge($this->options, [
-                        'id' => $this->getId() . '-' . $type . '-' . $i,
-                        'class' => $this->alertTypes[$type] . $appendClass,
-                    ]),
-                ]);
+                $html = <<<HTML
+<div id="w0-success-0" class="alert-$type alert fade in show">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    $message
+</div>
+HTML;
+
+                echo $html;
             }
 
             $session->removeFlash($type);

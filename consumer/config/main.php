@@ -11,6 +11,11 @@ return [
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log', 'queue'],
     'controllerNamespace' => 'consumer\controllers',
+    'modules' => [
+        'staff' => [
+            'class' => 'consumer\modules\staff\Module',
+        ],
+    ],
     'components' => [
         'request' => [
             'baseUrl' => '',
@@ -19,7 +24,7 @@ return [
         'user' => [
             'identityClass' => 'common\models\User',
             'enableAutoLogin' => true,
-            'loginUrl' => 'https://login.yanayarosh.ru/',
+            'loginUrl' => $params['login_url'],
             'identityCookie' => ['name' => '_identity-app', 'httpOnly' => true, 'domain' => '.app.ru'],
         ],
         'session' => [
@@ -49,6 +54,11 @@ return [
             ],
             'rules' => [
                 '' => 'site/index',
+
+                'staff' => 'staff/default/index',
+                'staff/<_c>' => 'staff/<_c>/index',
+                'staff/<_c>/<_a>' => 'staff/<_c>/<_a>',
+
                 'document/<id>' => 'site/view',
                 '<_a:login|logout>' => 'site/<_a>',
                 '<_c>' => '<_c>/index',

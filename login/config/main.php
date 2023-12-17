@@ -53,7 +53,7 @@ return [
             ],
             'rules' => [
 //                '' => 'main/default/index',
-                '<_a:login|logout|signup>' => 'main/default/<_a>',
+                '<_a:login|logout|signup|reset-password|verify-email>' => 'main/default/<_a>',
                 '<_m>' => '<_m>/default/index',
                 '<_m>/<_c>' => '<_m>/<_c>/index',
                 '<_m>/<_c>/<_a>' => '<_m>/<_c>/<_a>',

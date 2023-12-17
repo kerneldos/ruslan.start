@@ -4,6 +4,7 @@ namespace common\models;
 
 use Yii;
 use yii\base\Exception;
+use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -25,6 +26,7 @@ use yii\web\IdentityInterface;
  * @property integer $created_at
  * @property integer $updated_at
  * @property string $password write-only password
+ * @property Portal $ownPortal
  * @property Portal[] $portals
  */
 class User extends ActiveRecord implements IdentityInterface
@@ -107,7 +109,7 @@ class User extends ActiveRecord implements IdentityInterface
 
         return static::findOne([
             'password_reset_token' => $token,
-            'status' => self::STATUS_ACTIVE,
+//            'status' => self::STATUS_ACTIVE,
         ]);
     }
 
@@ -121,7 +123,7 @@ class User extends ActiveRecord implements IdentityInterface
     public static function findByVerificationToken(string $token): ?User {
         return static::findOne([
             'verification_token' => $token,
-            'status' => self::STATUS_INACTIVE
+            'status' => self::STATUS_INACTIVE,
         ]);
     }
 
@@ -228,23 +230,45 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * @return ActiveQuery
      */
-    public function getPortals(): ActiveQuery {
-        return $this->hasMany('common\models\Portal', ['user_id' => 'id']);
+    public function getOwnPortal(): ActiveQuery {
+        return $this->hasOne(Portal::class, ['user_id' => 'id']);
     }
 
     /**
-     * @param array $portalIds
+     * @param int $portalId
      *
      * @return void
      */
-    public function setPortals(array $portalIds): void {
+    public function setOwnPortal(int $portalId) {
+        $portal = Portal::findOne($portalId);
+        $portal->created_by = $this->id;
+        $portal->updated_by = $this->id;
+
+        $this->populateRelation('own_portal', $portal);
+    }
+
+    /**
+     * @return ActiveQuery
+     * @throws InvalidConfigException
+     */
+    public function getPortals(): ActiveQuery {
+        return $this->hasMany(Portal::class, ['id' => 'portal_id'])
+            ->viaTable(UserPortal::tableName(), ['user_id' => 'id']);
+    }
+
+    /**
+     * @param array|integer $portalIds
+     *
+     * @return void
+     */
+    public function setPortals($portalIds): void {
+        if (!is_array($portalIds)) {
+            $portalIds = [$portalIds];
+        }
+
         $portals = [];
         foreach ($portalIds as $portalId) {
-            $portal = Portal::findOne($portalId);
-            $portal->created_by = $this->id;
-            $portal->updated_by = $this->id;
-
-            $portals[] = $portal;
+            $portals[] = Portal::findOne($portalId);
         }
 
         $this->populateRelation('portals', $portals);
@@ -265,6 +289,10 @@ class User extends ActiveRecord implements IdentityInterface
             foreach ($relatedRecords['portals'] as $portal) {
                 $this->link('portals', $portal);
             }
+        }
+
+        if (isset($relatedRecords['own_portal'])) {
+            $this->link('ownPortal', $relatedRecords['own_portal']);
         }
     }
 }

@@ -2,8 +2,8 @@
 
 namespace common\rbac;
 
-use common\models\Portal;
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\rbac\Rule;
 
 class UserPortalRule extends Rule {
@@ -14,9 +14,7 @@ class UserPortalRule extends Rule {
      */
     public function execute($user, $item, $params): bool {
         if (!Yii::$app->user->isGuest) {
-            $userPortals = Portal::find()->select('temp_name')->where(['user_id' => $user])->column();
-
-            return in_array(Yii::$app->params['subDomain'], $userPortals);
+            return in_array(Yii::$app->params['subDomain'], ArrayHelper::getColumn(Yii::$app->user->identity->portals, 'temp_name'));
         }
 
         return false;

@@ -3,7 +3,7 @@
 /** @var yii\web\View $this */
 /** @var common\models\User $user */
 
-$verifyLink = Yii::$app->urlManager->createAbsoluteUrl(['verify-email', 'token' => $user->verification_token]);
+$verifyLink = sprintf('%s/reset-password?token=%s', Yii::$app->params['login_url'], $user->password_reset_token);
 ?>
 Hello <?= $user->username ?>,
 

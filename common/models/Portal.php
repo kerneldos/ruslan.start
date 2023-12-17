@@ -4,6 +4,7 @@ namespace common\models;
 
 use Yii;
 use yii\base\InvalidConfigException;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Connection;
 
@@ -18,6 +19,7 @@ use yii\db\Connection;
  * @property int|null $updated_at
  * @property int|null $created_by
  * @property int|null $updated_by
+ * @property User[] $users
  */
 class Portal extends ActiveRecord
 {
@@ -77,5 +79,14 @@ class Portal extends ActiveRecord
             'created_by' => 'Created By',
             'updated_by' => 'Updated By',
         ];
+    }
+
+    /**
+     * @return ActiveQuery
+     * @throws InvalidConfigException
+     */
+    public function getUsers(): ActiveQuery {
+        return $this->hasMany(User::class, ['id' => 'user_id'])
+            ->viaTable(UserPortal::tableName(), ['portal_id' => 'id']);
     }
 }

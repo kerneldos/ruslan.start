@@ -4,6 +4,7 @@ namespace login\models;
 
 use common\models\User;
 use Yii;
+use yii\base\Exception;
 use yii\base\InvalidArgumentException;
 use yii\base\Model;
 
@@ -54,12 +55,16 @@ class ResetPasswordForm extends Model
      * Resets password.
      *
      * @return bool if password was reset.
+     * @throws Exception
      */
     public function resetPassword(): bool {
         $user = $this->_user;
         $user->setPassword($this->password);
         $user->removePasswordResetToken();
         $user->generateAuthKey();
+        $user->status = User::STATUS_ACTIVE;
+
+        Yii::$app->user->login($user, 3600 * 24 * 30);
 
         return $user->save(false);
     }

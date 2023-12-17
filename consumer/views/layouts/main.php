@@ -4,6 +4,7 @@
 /** @var string $content */
 
 use common\assets\AppAsset;
+use common\widgets\Alert;
 use yii\widgets\Breadcrumbs;
 use yii\bootstrap\Html;
 
@@ -192,6 +193,26 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                             <p>Поиск</p>
                         </a>
                     </li>
+                    <li class="nav-item <?= Yii::$app->controller->module->id == 'staff' ? 'menu-is-opening menu-open' : '' ?>">
+                        <a href="/staff" class="nav-link">
+                            <i class="nav-icon fas fa-th"></i>
+                            <p>Персонал<i class="fas fa-angle-left right"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="/staff/users" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Пользователи</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/staff/org-structure" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Оргструктура</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                     <li class="nav-header">ADMIN</li>
                     <li class="nav-item">
                         <a href="/config/index" class="nav-link">
@@ -255,7 +276,12 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 
         <!-- Main content -->
         <section class="content">
-            <?= $content ?>
+            <div class="card">
+                <div class="card-body">
+                    <?= Alert::widget() ?>
+                    <?= $content ?>
+                </div>
+            </div>
         </section>
         <!-- /.content -->
     </div>

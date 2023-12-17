@@ -4,6 +4,7 @@ namespace login\modules\main\controllers;
 
 use common\models\LoginForm;
 use common\models\Portal;
+use InvalidArgumentException;
 use login\models\PasswordResetRequestForm;
 use login\models\ResendVerificationEmailForm;
 use login\models\ResetPasswordForm;
@@ -128,7 +129,8 @@ class DefaultController extends Controller
 
             $portal = Portal::findOne(['user_id' => null]);
             if (!empty($portal)) {
-                $user->portals = [$portal->id];
+                $user->ownPortal = $portal->id;
+                $user->portals   = $portal->id;
                 $user->save();
             } else {
                 throw new NotFoundHttpException('Server Error');
@@ -174,7 +176,7 @@ class DefaultController extends Controller
      * @param string $token
      *
      * @return Response|string
-     * @throws BadRequestHttpException
+     * @throws BadRequestHttpException|Exception
      */
     public function actionResetPassword(string $token)
     {
