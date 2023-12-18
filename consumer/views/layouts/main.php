@@ -195,19 +195,19 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                     </li>
                     <li class="nav-item <?= Yii::$app->controller->module->id == 'staff' ? 'menu-is-opening menu-open' : '' ?>">
                         <a href="/staff" class="nav-link">
-                            <i class="nav-icon fas fa-th"></i>
+                            <i class="nav-icon fas fa-people-arrows"></i>
                             <p>Персонал<i class="fas fa-angle-left right"></i></p>
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
                                 <a href="/staff/users" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
+                                    <i class="fas fa-users nav-icon"></i>
                                     <p>Пользователи</p>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a href="/staff/org-structure" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
+                                    <i class="fas fa-sitemap nav-icon"></i>
                                     <p>Оргструктура</p>
                                 </a>
                             </li>
