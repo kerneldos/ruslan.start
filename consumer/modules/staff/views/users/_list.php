@@ -5,7 +5,13 @@ use yii\helpers\Html;
 
 /** @var User $model */
 ?>
-<div class="card bg-light d-flex flex-fill">
+<div class="card bg-light d-flex flex-fill position-relative">
+    <div class="ribbon-wrapper">
+        <div class="ribbon bg-<?= $model->status == User::STATUS_ACTIVE ? 'success' : 'danger' ?>">
+            <?= $model->status == User::STATUS_ACTIVE ? 'Active' : 'Inactive' ?>
+        </div>
+    </div>
+
     <div class="card-header text-muted border-bottom-0">
 
     </div>
