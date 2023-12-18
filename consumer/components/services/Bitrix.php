@@ -13,7 +13,7 @@ class Bitrix extends OAuth2 implements ServiceInterface {
 
     const CATEGORY_NAME = 'Bitrix Диск';
 
-    const RETURN_URL = 'https://yanayarosh.ru/site/get-token?service=bitrix';
+    public $returnUrl = 'https://%s.yanayarosh.ru/site/get-token?service=bitrix';
 //    const RETURN_URL = 'https://127.0.0.1/site/get-token?service=bitrix';
 
     /** @inheritdoc */
@@ -26,9 +26,11 @@ class Bitrix extends OAuth2 implements ServiceInterface {
     public $apiBaseUrl = 'https://%s/rest/';
 
     /**
+     * @param string $consumer *
+     *
      * @return void
      */
-    public function indexing(): void {
+    public function indexing(string $consumer = ''): void {
         Yii::$app->queue->push(new BitrixIndexingJob());
     }
 
@@ -51,7 +53,7 @@ class Bitrix extends OAuth2 implements ServiceInterface {
 
         $this->clientId     = $clientId->value;
         $this->clientSecret = $clientSecret->value;
-        $this->returnUrl    = self::RETURN_URL;
+        $this->returnUrl    = sprintf($this->returnUrl, Yii::$app->params['subDomain']);
         $this->authUrl      = sprintf($this->authUrl, $domain->value);
         $this->apiBaseUrl   = sprintf($this->apiBaseUrl, $domain->value);
 

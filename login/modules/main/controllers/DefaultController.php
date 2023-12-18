@@ -15,6 +15,7 @@ use yii\base\Exception;
 use yii\filters\AccessControl;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
+use yii\web\ErrorAction;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
@@ -49,7 +50,7 @@ class DefaultController extends Controller
     public function actions(): array {
         return [
             'error' => [
-                'class' => \yii\web\ErrorAction::class,
+                'class' => ErrorAction::class,
                 'layout' => 'main',
             ],
         ];
@@ -65,7 +66,7 @@ class DefaultController extends Controller
         $userPortal  = reset($userPortals);
         $redirectUrl = sprintf('https://%s.%s', $userPortal->temp_name, Yii::$app->params['main_domain']);
 
-        return $this->redirect($redirectUrl);
+        return $this->goBack($redirectUrl);
     }
 
     /**
@@ -82,7 +83,7 @@ class DefaultController extends Controller
             $userPortal  = reset($userPortals);
             $redirectUrl = sprintf('https://%s.%s', $userPortal->temp_name, Yii::$app->params['main_domain']);
 
-            return $this->redirect($redirectUrl);
+            return $this->goBack($redirectUrl);
         }
 
         $this->layout = 'login';
@@ -95,7 +96,7 @@ class DefaultController extends Controller
             $userPortal  = reset($userPortals);
             $redirectUrl = sprintf('https://%s.%s', $userPortal->temp_name, Yii::$app->params['main_domain']);
 
-            return $this->redirect($redirectUrl);
+            return $this->goBack($redirectUrl);
         }
 
         $model->password = '';
