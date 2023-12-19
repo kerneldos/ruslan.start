@@ -47,7 +47,13 @@ class YandexIndexingJob extends BaseObject implements JobInterface {
             Yii::debug($response['items']);
 
             foreach ($response['items'] as $file) {
-                $downloadUrlResponse = $client->api('disk/resources/download', 'GET', ['path' => $file['path']]);
+                try {
+                    $downloadUrlResponse = $client->api('disk/resources/download', 'GET', ['path' => $file['path']]);
+                } catch (\Throwable $exception) {
+                    $downloadUrlResponse = [];
+
+                    Yii::error($exception->getTraceAsString());
+                }
 
                 if (!empty($downloadUrlResponse)) {
                     $document = new Document([
