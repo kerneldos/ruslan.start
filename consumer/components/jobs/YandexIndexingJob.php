@@ -11,7 +11,7 @@ use yii\base\BaseObject;
 use yii\base\InvalidConfigException;
 use yii\queue\JobInterface;
 
-class YandexIndexingJob extends BaseJob implements JobInterface {
+class YandexIndexingJob extends BaseObject implements JobInterface {
     protected int $rootCategoryId;
 
     public string $consumer;
@@ -69,7 +69,7 @@ class YandexIndexingJob extends BaseJob implements JobInterface {
                         'file'       => $file['path'],
                     ]);
 
-                    $this->indexDocument($document);
+                    Yii::$app->queue->push(new SambaFileJob(['document' => $document, 'consumer' => $this->consumer]));
                 }
             }
         } else {
