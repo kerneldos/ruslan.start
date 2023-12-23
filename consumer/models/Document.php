@@ -247,6 +247,6 @@ class Document extends ActiveRecord
     public static function index(): string {
         $index = parent::index();
 
-        return $index . '_' . Yii::$app->params['subDomain'];
+        return $index . '_' . Yii::$app->params['sub_domain'];
     }
 }

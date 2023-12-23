@@ -41,6 +41,6 @@ class Module extends \yii\base\Module
     {
         parent::init();
 
-        $this->portal = Portal::findOne(['temp_name' => Yii::$app->params['subDomain']]);
+        $this->portal = Portal::findOne(['temp_name' => Yii::$app->params['sub_domain']]);
     }
 }

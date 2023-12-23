@@ -25,11 +25,11 @@ return [
             'identityClass' => 'common\models\User',
             'enableAutoLogin' => true,
             'loginUrl' => $params['login_url'],
-            'identityCookie' => ['name' => '_identity-app', 'httpOnly' => true, 'domain' => '.app.ru'],
+            'identityCookie' => ['name' => '_identity-app', 'httpOnly' => true, 'domain' => '.' . $params['main_domain']],
         ],
         'session' => [
             'cookieParams' => [
-                'domain' => '.app.ru',
+                'domain' => '.' . $params['main_domain'],
                 'httpOnly' => true,
             ],
         ],

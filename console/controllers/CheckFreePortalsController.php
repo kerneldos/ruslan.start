@@ -94,7 +94,7 @@ class CheckFreePortalsController extends Controller {
                 $consumerConfig = require dirname(__DIR__, 2) . '/consumer/config/client/' . $portal->temp_name . '.php';
 
                 Yii::$app->set('db', $consumerConfig['components']['db']);
-                Yii::$app->params['subDomain'] = $portal->temp_name;
+                Yii::$app->params['sub_domain'] = $portal->temp_name;
 
                 Yii::$app->runAction('migrate/up', ['migrationPath' => '@console/migrations/consumer/', 'interactive' => false]);
 

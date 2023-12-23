@@ -12,6 +12,6 @@ return [
         ],
     ],
     'params' => [
-        'subDomain' => '<?= $consumer ?>',
+        'sub_domain' => '<?= $consumer ?>',
     ],
 ];

@@ -19,13 +19,22 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php $form = ActiveForm::begin(['id' => 'reset-password-form']); ?>
         <div class="row">
             <div class="input-group mb-3 col-12">
-                <?= Html::activeInput('password', $model, 'password', ['class' => 'form-control', 'placeholder' => 'Password']) ?>
+                <?php $error = $model->hasErrors('password'); ?>
+
+                <?= Html::activeInput('password', $model, 'password', [
+                    'class' => 'form-control ' . ($error ? 'is-invalid' : ''),
+                    'placeholder' => 'Password',
+                ]) ?>
 
                 <div class="input-group-append">
                     <div class="input-group-text">
                         <span class="fas fa-lock"></span>
                     </div>
                 </div>
+
+                <?php if ($error): ?>
+                    <span class="error invalid-feedback"><?= join(' ', $model->errors['password']) ?></span>
+                <?php endif; ?>
             </div>
 
             <div class="col-4">

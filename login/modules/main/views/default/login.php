@@ -17,21 +17,36 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php $form = ActiveForm::begin(['id' => 'login-form']); ?>
         <div class="row">
             <div class="input-group mb-3 col-12">
+                <?php $error = $model->hasErrors('username'); ?>
+
                 <?= Html::activeTextInput($model, 'username', ['placeholder' => 'Login', 'class' => 'form-control']) ?>
                 <div class="input-group-append">
                     <div class="input-group-text">
                         <span class="fas fa-envelope"></span>
                     </div>
                 </div>
+                <?php if ($error): ?>
+                    <span class="error invalid-feedback"><?= join(' ', $model->errors['username']) ?></span>
+                <?php endif; ?>
             </div>
 
             <div class="input-group mb-3 col-12">
-                <?= Html::activePasswordInput($model, 'password', ['placeholder' => 'Password', 'class' => 'form-control']) ?>
+                <?php $error = $model->hasErrors('password'); ?>
+
+                <?= Html::activePasswordInput($model, 'password', [
+                    'placeholder' => 'Password',
+                    'class' => 'form-control ' . ($error ? 'is-invalid' : ''),
+                ]) ?>
+
                 <div class="input-group-append">
                     <div class="input-group-text">
                         <span class="fas fa-lock"></span>
                     </div>
                 </div>
+
+                <?php if ($error): ?>
+                    <span class="error invalid-feedback"><?= join(' ', $model->errors['password']) ?></span>
+                <?php endif; ?>
             </div>
         </div>
 

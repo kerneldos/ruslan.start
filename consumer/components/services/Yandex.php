@@ -45,7 +45,7 @@ class Yandex extends \yii\authclient\clients\Yandex implements ServiceInterface 
 
         $this->clientId     = $clientId->value;
         $this->clientSecret = $clientSecret->value;
-        $this->returnUrl    = sprintf(self::RETURN_URL, Yii::$app->params['subDomain'], Yii::$app->params['main_domain']);
+        $this->returnUrl    = sprintf(self::RETURN_URL, Yii::$app->params['sub_domain'], Yii::$app->params['main_domain']);
 
         $this->stateStorage = 'consumer\components\services\DbStateStorage';
     }

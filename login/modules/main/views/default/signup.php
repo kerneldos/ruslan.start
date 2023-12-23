@@ -18,31 +18,58 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php $form = ActiveForm::begin(['id' => 'form-signup']); ?>
         <div class="row">
             <div class="input-group mb-3 col-12">
-                <?= Html::activeInput('text', $model, 'username', ['class' => 'form-control', 'placeholder' => 'Login']) ?>
+                <?php $error = $model->hasErrors('username'); ?>
+
+                <?= Html::activeInput('text', $model, 'username', [
+                    'class' => 'form-control ' . ($error ? 'is-invalid' : ''),
+                    'placeholder' => 'Login',
+                ]) ?>
 
                 <div class="input-group-append">
                     <div class="input-group-text">
                         <span class="fas fa-user"></span>
                     </div>
                 </div>
+
+                <?php if ($error): ?>
+                    <span class="error invalid-feedback"><?= join(' ', $model->errors['username']) ?></span>
+                <?php endif; ?>
             </div>
             <div class="input-group mb-3 col-12">
-                <?= Html::activeInput('email', $model, 'email', ['class' => 'form-control', 'placeholder' => 'Email']) ?>
+                <?php $error = $model->hasErrors('email'); ?>
+
+                <?= Html::activeInput('email', $model, 'email', [
+                    'class' => 'form-control ' . ($error ? 'is-invalid' : ''),
+                    'placeholder' => 'Email',
+                ]) ?>
 
                 <div class="input-group-append">
                     <div class="input-group-text">
                         <span class="fas fa-envelope"></span>
                     </div>
                 </div>
+
+                <?php if ($error): ?>
+                    <span class="error invalid-feedback"><?= join(' ', $model->errors['email']) ?></span>
+                <?php endif; ?>
             </div>
             <div class="input-group mb-3 col-12">
-                <?= Html::activeInput('password', $model, 'password', ['class' => 'form-control', 'placeholder' => 'Password']) ?>
+                <?php $error = $model->hasErrors('password'); ?>
+
+                <?= Html::activeInput('password', $model, 'password', [
+                    'class' => 'form-control ' . ($error ? 'is-invalid' : ''),
+                    'placeholder' => 'Password',
+                ]) ?>
 
                 <div class="input-group-append">
                     <div class="input-group-text">
                         <span class="fas fa-lock"></span>
                     </div>
                 </div>
+
+                <?php if ($error): ?>
+                    <span class="error invalid-feedback"><?= join(' ', $model->errors['password']) ?></span>
+                <?php endif; ?>
             </div>
         </div>
 

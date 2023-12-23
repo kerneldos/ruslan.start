@@ -25,12 +25,22 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php $form = ActiveForm::begin(['id' => 'invite-form']); ?>
     <div class="row">
         <div class="input-group mb-3 col-4">
-            <?= Html::activeTextInput($model, 'email', ['placeholder' => 'Email', 'class' => 'form-control']) ?>
+            <?php $error = $model->hasErrors('email'); ?>
+
+            <?= Html::activeTextInput($model, 'email', [
+                'placeholder' => 'Email',
+                'class' => 'form-control ' . ($error ? 'is-invalid' : ''),
+            ]) ?>
+
             <div class="input-group-append">
                 <div class="input-group-text">
                     <span class="fas fa-envelope"></span>
                 </div>
             </div>
+
+            <?php if ($error): ?>
+                <span class="error invalid-feedback"><?= join(' ', $model->errors['email']) ?></span>
+            <?php endif; ?>
         </div>
 
         <div class="col-12">

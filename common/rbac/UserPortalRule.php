@@ -14,7 +14,7 @@ class UserPortalRule extends Rule {
      */
     public function execute($user, $item, $params): bool {
         if (!Yii::$app->user->isGuest) {
-            return in_array(Yii::$app->params['subDomain'], ArrayHelper::getColumn(Yii::$app->user->identity->portals, 'temp_name'));
+            return in_array(Yii::$app->params['sub_domain'], ArrayHelper::getColumn(Yii::$app->user->identity->portals, 'temp_name'));
         }
 
         return false;
