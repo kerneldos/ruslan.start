@@ -14,5 +14,28 @@ return [
             'db' => 'loginDb',
             'defaultRoles' => ['portal_member'],
         ],
+        'authClientCollection' => [
+            'class' => 'yii\authclient\Collection',
+            'clients' => [
+                'yandex' => [
+                    'class' => 'consumer\components\services\Yandex',
+                    'apiBaseUrl' => 'https://cloud-api.yandex.net/v1/',
+                    'normalizeUserAttributeMap' => [
+                        'email' => function ($attributes) {
+                            return $attributes['email']
+                                ?? $attributes['default_email']
+                                ?? current($attributes['emails'] ?? [])
+                                ?: null;
+                        }
+                    ],
+                ],
+                'samba' => [
+                    'class' => 'consumer\components\services\Samba',
+                ],
+                'bitrix' => [
+                    'class' => 'consumer\components\services\Bitrix',
+                ],
+            ],
+        ],
     ],
 ];
