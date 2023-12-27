@@ -56,6 +56,10 @@ class YandexIndexingJob extends BaseObject implements JobInterface {
                 }
 
                 if (!empty($downloadUrlResponse)) {
+                    $fp = fopen(Yii::getAlias('@runtime/files_to_download.log'), 'a');
+                    fwrite($fp, sprintf('%s%s %s%s', PHP_EOL, date('d.m.Y H:i:s'), print_r($file, true), PHP_EOL));
+                    fclose($fp);
+
                     $document = new Document([
                         'name'       => $file['name'],
                         'type'       => 'yandex',
