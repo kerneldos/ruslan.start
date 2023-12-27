@@ -42,7 +42,7 @@ class SambaFileJob extends BaseObject implements JobInterface {
 
                     $content = $client->getText($this->document->path);
                 } catch (\Throwable $exception) {
-                    $content = 'Error get text';
+                    $content = $exception->getMessage();
                 }
             } else {
                 $content = 'Very Large File';
