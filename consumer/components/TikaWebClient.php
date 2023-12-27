@@ -384,7 +384,8 @@ class TikaWebClient extends TikaClient {
      */
     public function setTimeout(int $value): self
     {
-        $this->setOption(CURLOPT_TIMEOUT, (int) $value);
+        $this->setOption(CURLOPT_TIMEOUT, $value);
+        $this->setOption(CURLOPT_CONNECTTIMEOUT, $value);
 
         return $this;
     }
