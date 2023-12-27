@@ -36,8 +36,10 @@ class SambaFileJob extends BaseObject implements JobInterface {
         if (empty($existsDocument)) {
             if ($this->document->size < 200 * 1024 * 1024) {
                 try {
-                    $client = TikaClient::make('tika.local', 9998);
-                    $client->setTimeout(0);
+                    $client = TikaClient::make('tika.local', 9998, [
+                        CURLOPT_TIMEOUT => 0,
+                        CURLOPT_CONNECTTIMEOUT => 0,
+                    ]);
                     $client->setOCRLanguages(['rus', 'eng']);
 
                     $content = $client->getText($this->document->path);
