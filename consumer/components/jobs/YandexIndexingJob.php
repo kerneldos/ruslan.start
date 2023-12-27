@@ -70,6 +70,10 @@ class YandexIndexingJob extends BaseObject implements JobInterface {
                     ]);
 
                     Yii::$app->queue->push(new SambaFileJob(['document' => $document, 'consumer' => $this->consumer]));
+                } else {
+                    $fp = fopen(Yii::getAlias('@runtime/empty_download_url.log'), 'a');
+                    fwrite($fp, sprintf('%s%s %s%s', PHP_EOL, date('d.m.Y H:i:s'), print_r($file, true), PHP_EOL));
+                    fclose($fp);
                 }
             }
         } else {
