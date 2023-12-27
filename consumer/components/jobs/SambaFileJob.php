@@ -29,13 +29,15 @@ class SambaFileJob extends BaseObject implements JobInterface {
         Yii::$app->set('db', $config['components']['db']);
         Yii::$app->params = array_merge(Yii::$app->params, $config['params']);
 
+        file_put_contents(Yii::getAlias('@runtime/index.log'), Document::index());
+
         $existsDocument = Document::findOne(['md5' => $this->document->md5, 'type' => $this->document->type]);
 
         if (empty($existsDocument)) {
             if ($this->document->size < 200 * 1024 * 1024) {
                 try {
                     $client = TikaClient::make('tika.local', 9998);
-                    $client->setTimeout(300);
+                    $client->setTimeout(0);
                     $client->setOCRLanguages(['rus', 'eng']);
 
                     $content = $client->getText($this->document->path);
