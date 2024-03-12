@@ -5,6 +5,7 @@ namespace consumer\components\jobs;
 use consumer\components\services\Yandex;
 use consumer\models\Category;
 use consumer\models\Document;
+use consumer\models\QueueIndex;
 use Yii;
 use yii\authclient\OAuth2;
 use yii\base\BaseObject;
@@ -35,6 +36,8 @@ class YandexIndexingJob extends BaseObject implements JobInterface {
 
         $this->rootCategoryId = $rootCategory->id;
 
+        $this->processDocuments();
+
         /** @var OAuth2 $client */
         $client = Yii::$app->authClientCollection->getClient(Yandex::SERVICE_NAME);
 
@@ -47,12 +50,45 @@ class YandexIndexingJob extends BaseObject implements JobInterface {
             file_put_contents(Yii::getAlias('@runtime/file_list.log'), print_r($response['items'], true));
 
             foreach ($response['items'] as $file) {
+                $existsDocument = Document::findOne(['md5' => $file['md5'], 'type' => 'yandex']);
+
+                if (empty($existsDocument)) {
+                    $documentToIndex = new QueueIndex([
+                        'type' => 'yandex',
+                        'data' => serialize($file),
+                        'md5' => $file['md5'],
+                    ]);
+
+                    $documentToIndex->save();
+                }
+            }
+        } else {
+            file_put_contents(Yii::getAlias('@runtime/yandex.log'), print_r($response['items'], true));
+        }
+
+        $this->processDocuments();
+    }
+
+    /**
+     * @return void
+     */
+    protected function processDocuments() {
+        $documentsToIndex = QueueIndex::find()->where(['type' => 'yandex'])->all();
+
+        if (!empty($documentsToIndex)) {
+            /** @var OAuth2 $client */
+            $client = Yii::$app->authClientCollection->getClient(Yandex::SERVICE_NAME);
+
+            /** @var QueueIndex $queueItem */
+            foreach ($documentsToIndex as $queueItem) {
+                $file = unserialize($queueItem->data);
+
                 try {
                     $downloadUrlResponse = $client->api('disk/resources/download', 'GET', ['path' => $file['path']]);
                 } catch (\Throwable $exception) {
                     $downloadUrlResponse = [];
 
-                    Yii::error($exception->getTraceAsString());
+                    Yii::error(print_r([$file['name'], $exception->getMessage()], true));
                 }
 
                 if (!empty($downloadUrlResponse)) {
@@ -80,8 +116,6 @@ class YandexIndexingJob extends BaseObject implements JobInterface {
                     fclose($fp);
                 }
             }
-        } else {
-            Yii::debug($response);
         }
     }
 }

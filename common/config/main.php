@@ -35,6 +35,9 @@ return [
                 'bitrix' => [
                     'class' => 'consumer\components\services\Bitrix',
                 ],
+                'local' => [
+                    'class' => 'consumer\components\services\Local',
+                ],
             ],
         ],
     ],

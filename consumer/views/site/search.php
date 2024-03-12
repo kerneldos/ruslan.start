@@ -35,6 +35,9 @@ $this->title = 'Search Project';
                         <?= Html::a('Проиндексировать Bitrix диск', ['/site/indexing', 'service' => 'bitrix'], [
                             'class' => 'btn btn-primary',
                         ]) ?>
+                        <?= Html::a('Проиндексировать загрузки', ['/site/indexing', 'service' => 'local'], [
+                            'class' => 'btn btn-primary',
+                        ]) ?>
                     </div>
                 </div>
             </div>

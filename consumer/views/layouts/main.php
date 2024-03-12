@@ -193,6 +193,12 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                             <p>Поиск</p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="/files" class="nav-link">
+                            <i class="nav-icon fas fa-th"></i>
+                            <p>Файловый менеджер</p>
+                        </a>
+                    </li>
                     <li class="nav-item <?= Yii::$app->controller->module->id == 'staff' ? 'menu-is-opening menu-open' : '' ?>">
                         <a href="/staff" class="nav-link">
                             <i class="nav-icon fas fa-people-arrows"></i>

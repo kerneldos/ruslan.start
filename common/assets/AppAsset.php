@@ -30,6 +30,7 @@ class AppAsset extends AssetBundle
         'dist/css/adminlte.min.css',
         'plugins/overlayScrollbars/css/OverlayScrollbars.min.css',
         'plugins/summernote/summernote-bs4.min.css',
+        'plugins/dropzone/min/dropzone.min.css',
         'css/site.css',
     ];
 
@@ -50,6 +51,7 @@ class AppAsset extends AssetBundle
         'dist/js/adminlte.js',
         'plugins/select2/js/select2.full.min.js',
         'plugins/bs-custom-file-input/bs-custom-file-input.min.js',
+        'plugins/dropzone/min/dropzone.min.js',
         //        'dist/js/pages/dashboard.js',
         'js/app.js',
     ];

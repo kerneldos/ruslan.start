@@ -5,6 +5,7 @@ namespace consumer\components\jobs;
 use consumer\components\TikaClient;
 use consumer\models\AiCategory;
 use consumer\models\Document;
+use consumer\models\QueueIndex;
 use consumer\models\Tag;
 use Throwable;
 use Yii;
@@ -129,6 +130,10 @@ class SambaFileJob extends BaseObject implements JobInterface {
             }
 
             $this->document->save();
+
+            if ($documentToIndex = QueueIndex::findOne(['type' => $this->document->type, 'md5' => $this->document->md5])) {
+                $documentToIndex->delete();
+            }
         }
     }
 }
