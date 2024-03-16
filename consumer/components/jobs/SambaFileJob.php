@@ -11,6 +11,7 @@ use Throwable;
 use Yii;
 use yii\base\BaseObject;
 use yii\base\InvalidConfigException;
+use yii\db\StaleObjectException;
 use yii\httpclient\Client;
 use yii\queue\JobInterface;
 
@@ -24,6 +25,8 @@ class SambaFileJob extends BaseObject implements JobInterface {
      *
      * @return void
      * @throws InvalidConfigException
+     * @throws Throwable
+     * @throws StaleObjectException
      */
     public function execute($queue) {
         $config = require_once dirname(__DIR__, 2) . '/config/client/' . $this->consumer . '.php';
@@ -41,11 +44,14 @@ class SambaFileJob extends BaseObject implements JobInterface {
                         CURLOPT_TIMEOUT => 0,
                         CURLOPT_CONNECTTIMEOUT => 0,
                     ]);
+//                    $client->setHeader('X-Tika-Timeout-Millis', 600000);
                     $client->setOCRLanguages(['rus', 'eng']);
 
                     $content = $client->getText($this->document->path);
                 } catch (\Throwable $exception) {
-                    $content = $exception->getMessage();
+                    Yii::error($exception->getMessage(), __METHOD__);
+
+                    $content = '';
                 }
             } else {
                 $content = 'Very Large File';
@@ -129,7 +135,9 @@ class SambaFileJob extends BaseObject implements JobInterface {
                 file_put_contents(Yii::getAlias('/tmp/insert.log'), print_r($exception->getMessage(), true), FILE_APPEND);
             }
 
-            $this->document->save();
+            if (!empty($content)) {
+                $this->document->save();
+            }
 
             if ($documentToIndex = QueueIndex::findOne(['type' => $this->document->type, 'md5' => $this->document->md5])) {
                 $documentToIndex->delete();

@@ -34,31 +34,33 @@ $this->title = 'Search Project';
             </div>
         <?php endif; ?>
 
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="list-group">
-                    <?= ListView::widget([
-                        'dataProvider' => $dataProvider,
-                        'itemView' => '_list',
-                        'layout' => "{summary}\n{items}\n{pager}",
-                        'pager' => [
-                            'options' => [
-                                'class' => 'pagination mt-2',
+        <?php if ($dataProvider->totalCount > 0): ?>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="list-group">
+                        <?= ListView::widget([
+                            'dataProvider' => $dataProvider,
+                            'itemView' => '_list',
+                            'layout' => "{summary}\n{items}\n{pager}",
+                            'pager' => [
+                                'options' => [
+                                    'class' => 'pagination mt-2',
+                                ],
+
+                                // Customzing CSS class for pager link
+                                'linkOptions' => ['class' => 'page-link'],
+                                'pageCssClass' => 'paginate_button page-item',
+                                'activePageCssClass' => 'paginate_button page-item active',
+
+                                // Customzing CSS class for navigating link
+                                'prevPageCssClass' => 'paginate_button page-item previous',
+                                'nextPageCssClass' => 'paginate_button page-item next',
+                                'disabledListItemSubTagOptions' => ['tag' => 'a', 'class' => 'page-link'],
                             ],
-
-                            // Customzing CSS class for pager link
-                            'linkOptions' => ['class' => 'page-link'],
-                            'pageCssClass' => 'paginate_button page-item',
-                            'activePageCssClass' => 'paginate_button page-item active',
-
-                            // Customzing CSS class for navigating link
-                            'prevPageCssClass' => 'paginate_button page-item previous',
-                            'nextPageCssClass' => 'paginate_button page-item next',
-                            'disabledListItemSubTagOptions' => ['tag' => 'a', 'class' => 'page-link'],
-                        ],
-                    ]); ?>
+                        ]); ?>
+                    </div>
                 </div>
             </div>
-        </div>
+        <?php endif; ?>
     </div>
 </div>
