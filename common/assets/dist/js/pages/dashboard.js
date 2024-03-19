@@ -16,7 +16,12 @@ $(function () {
     connectWith: '.connectedSortable',
     handle: '.card-header, .nav-tabs',
     forcePlaceholderSize: true,
-    zIndex: 999999
+    zIndex: 999999,
+    animation: 200,
+    revert: true,
+    update: function( event, ui ) {
+      console.log($(this).sortable('toArray'));
+    }
   })
   $('.connectedSortable .card-header').css('cursor', 'move')
 
@@ -25,7 +30,7 @@ $(function () {
     placeholder: 'sort-highlight',
     handle: '.handle',
     forcePlaceholderSize: true,
-    zIndex: 999999
+    zIndex: 999999,
   })
 
   // bootstrap WYSIHTML5 - text editor

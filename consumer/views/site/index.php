@@ -17,9 +17,8 @@ $this->title = 'Search Project';
 <div class="site-index">
     <div class="container-fluid">
         <!-- Main row -->
-        <div class="row">
-            <!-- Left col -->
-            <section class="col-lg-6 connectedSortable">
+        <div class="row connectedSortable">
+            <section class="col-lg-4" id="module1">
                 <!-- Custom tabs (Charts with tabs)-->
                 <div class="card">
                     <div class="card-header">
@@ -35,7 +34,9 @@ $this->title = 'Search Project';
                     </div><!-- /.card-body -->
                 </div>
                 <!-- /.card -->
+            </section>
 
+            <section class="col-lg-4" id="module2">
                 <!-- TO DO List -->
                 <div class="card">
                     <div class="card-header">
@@ -60,9 +61,9 @@ $this->title = 'Search Project';
                             <li>
                                 <!-- drag handle -->
                                 <span class="handle">
-                      <i class="fas fa-ellipsis-v"></i>
-                      <i class="fas fa-ellipsis-v"></i>
-                    </span>
+                                  <i class="fas fa-ellipsis-v"></i>
+                                  <i class="fas fa-ellipsis-v"></i>
+                                </span>
                                 <!-- checkbox -->
                                 <div  class="icheck-primary d-inline ml-2">
                                     <input type="checkbox" value="" name="todo1" id="todoCheck1">
@@ -79,10 +80,10 @@ $this->title = 'Search Project';
                                 </div>
                             </li>
                             <li>
-                    <span class="handle">
-                      <i class="fas fa-ellipsis-v"></i>
-                      <i class="fas fa-ellipsis-v"></i>
-                    </span>
+                                <span class="handle">
+                                  <i class="fas fa-ellipsis-v"></i>
+                                  <i class="fas fa-ellipsis-v"></i>
+                                </span>
                                 <div  class="icheck-primary d-inline ml-2">
                                     <input type="checkbox" value="" name="todo2" id="todoCheck2" checked>
                                     <label for="todoCheck2"></label>
@@ -95,10 +96,10 @@ $this->title = 'Search Project';
                                 </div>
                             </li>
                             <li>
-                    <span class="handle">
-                      <i class="fas fa-ellipsis-v"></i>
-                      <i class="fas fa-ellipsis-v"></i>
-                    </span>
+                                <span class="handle">
+                                  <i class="fas fa-ellipsis-v"></i>
+                                  <i class="fas fa-ellipsis-v"></i>
+                                </span>
                                 <div  class="icheck-primary d-inline ml-2">
                                     <input type="checkbox" value="" name="todo3" id="todoCheck3">
                                     <label for="todoCheck3"></label>
@@ -167,10 +168,8 @@ $this->title = 'Search Project';
                 </div>
                 <!-- /.card -->
             </section>
-            <!-- /.Left col -->
-            <!-- right col (We are only adding the ID to make the widgets sortable)-->
-            <section class="col-lg-6 connectedSortable">
 
+            <section class="col-lg-4" id="module3">
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">
@@ -184,11 +183,12 @@ $this->title = 'Search Project';
                         </div>
                     </div><!-- /.card-body -->
                 </div>
+            </section>
 
+            <section class="col-lg-4" id="module4">
                 <!-- Calendar -->
-                <div class="card bg-gradient-success">
+                <div class="card">
                     <div class="card-header border-0">
-
                         <h3 class="card-title">
                             <i class="far fa-calendar-alt"></i>
                             Calendar
@@ -197,7 +197,7 @@ $this->title = 'Search Project';
                         <div class="card-tools">
                             <!-- button with a dropdown -->
                             <div class="btn-group">
-                                <button type="button" class="btn btn-success btn-sm dropdown-toggle" data-toggle="dropdown" data-offset="-52">
+                                <button type="button" class="btn btn-sm dropdown-toggle" data-toggle="dropdown" data-offset="-52">
                                     <i class="fas fa-bars"></i>
                                 </button>
                                 <div class="dropdown-menu" role="menu">
@@ -207,10 +207,10 @@ $this->title = 'Search Project';
                                     <a href="#" class="dropdown-item">View calendar</a>
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-success btn-sm" data-card-widget="collapse">
+                            <button type="button" class="btn btn-sm" data-card-widget="collapse">
                                 <i class="fas fa-minus"></i>
                             </button>
-                            <button type="button" class="btn btn-success btn-sm" data-card-widget="remove">
+                            <button type="button" class="btn btn-sm" data-card-widget="remove">
                                 <i class="fas fa-times"></i>
                             </button>
                         </div>
@@ -225,8 +225,29 @@ $this->title = 'Search Project';
                 </div>
                 <!-- /.card -->
             </section>
-            <!-- right col -->
         </div>
         <!-- /.row (main row) -->
     </div>
 </div>
+
+<style>
+    /* Re-order items into 3 rows */
+    .connectedSortable .card {
+        height: 400px;
+    }
+</style>
+
+<?php
+$js = <<<JS
+    $('[data-card-widget="collapse"]').on('click', function () {
+        let card = $(this).closest('.card');
+
+        if (!card.is('.collapsed-card')) {
+            card.css('height', 'auto');
+        } else {
+            card.removeAttr('style');
+        }
+    })
+JS;
+
+$this->registerJs($js);
