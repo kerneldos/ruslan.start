@@ -3,7 +3,10 @@
 use common\models\User;
 use yii\helpers\Html;
 
+/** @var yii\web\View $this */
 /** @var User $model */
+
+$bundle = $this->assetManager->getBundle('common\assets\AppAsset');
 ?>
 <div class="card bg-light d-flex flex-fill position-relative">
     <div class="ribbon-wrapper">
@@ -26,7 +29,7 @@ use yii\helpers\Html;
                 </ul>
             </div>
             <div class="col-5 text-center">
-                <img src="/img/no_avatar.png" alt="user-avatar" class="img-circle img-fluid">
+                <img src="<?= $bundle->baseUrl ?>/img/no_avatar.png" alt="user-avatar" class="img-circle img-fluid">
             </div>
         </div>
     </div>

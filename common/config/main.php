@@ -40,5 +40,8 @@ return [
                 ],
             ],
         ],
+        'assetManager' => [
+            'linkAssets' => true,
+        ],
     ],
 ];

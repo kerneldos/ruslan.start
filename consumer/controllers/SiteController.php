@@ -109,7 +109,7 @@ class SiteController extends BaseController
 
             $searchResult = Document::find()->addAggregate('documents_by_date', [
                 'date_histogram' => [
-                    'field' => 'attachment.date',
+                    'field' => 'created',
                     'calendar_interval' => 'month',
                     'min_doc_count' => 1,
                 ],
@@ -129,7 +129,7 @@ class SiteController extends BaseController
             ]);
         }
 
-//        $this->view->registerJsFile(Yii::getAlias('@common/web/dist/js/pages/dashboard.js'), ['depends' => ['common\assets\AppAsset']]);
+        $this->view->assetManager->getBundle('common\assets\AppAsset')->js[] = 'dist/js/pages/dashboard.js';
 
         return $this->render('index');
     }

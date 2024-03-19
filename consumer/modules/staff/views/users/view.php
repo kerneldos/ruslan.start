@@ -10,6 +10,7 @@ $this->title = '';//$model->id;
 $this->params['breadcrumbs'][] = ['label' => 'Users', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
+$bundle = $this->assetManager->getBundle('common\assets\AppAsset');
 ?>
 <div class="container-fluid">
     <div class="row">
@@ -20,7 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="card-body box-profile">
                     <div class="text-center">
                         <img class="profile-user-img img-fluid img-circle"
-                             src="/img/no_avatar.png"
+                             src="<?= $bundle->baseUrl ?>/img/no_avatar.png"
                              alt="User profile picture">
                     </div>
 

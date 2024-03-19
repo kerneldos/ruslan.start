@@ -17,7 +17,7 @@ use yii\web\AssetBundle;
  */
 class AppAsset extends AssetBundle
 {
-    public $sourcePath = '@common/web';
+    public $sourcePath = __DIR__;
 
     public $css = [
         'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback',

@@ -65,6 +65,12 @@ return [
                 '<_c>/<_a>' => '<_c>/<_a>',
             ],
         ],
+        'db' => [
+            'class' => 'yii\db\Connection',
+            'username' => 'root',
+            'password' => 'secret',
+            'charset' => 'utf8',
+        ],
     ],
     'params' => $params,
 ];

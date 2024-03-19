@@ -35,11 +35,9 @@ phpunit.phar
 /.vagrant
 
 # ignore generated files
-/consumer/web/index.php
-/consumer/web/index-test.php
-/consumer/web/robots.txt
 /login/web/index.php
 /login/web/index-test.php
 /login/web/robots.txt
-/consumer/config/client/
 /consumer/files/
+/consumer/web/**
+/consumer/clients/
