@@ -9,11 +9,15 @@ $params = array_merge(
 return [
     'id' => 'app-consumer',
     'basePath' => dirname(__DIR__),
+    'defaultRoute' => 'dashboard',
     'bootstrap' => ['log', 'queue'],
     'controllerNamespace' => 'consumer\controllers',
     'modules' => [
         'staff' => [
             'class' => 'consumer\modules\staff\Module',
+        ],
+        'dashboard' => [
+            'class' => 'consumer\modules\dashboard\Module',
         ],
     ],
     'components' => [
@@ -53,11 +57,15 @@ return [
                 'action' => yii\web\UrlNormalizer::ACTION_REDIRECT_TEMPORARY,
             ],
             'rules' => [
-                '' => 'site/index',
+//                '' => 'site/index',
 
                 'staff' => 'staff/default/index',
                 'staff/<_c>' => 'staff/<_c>/index',
                 'staff/<_c>/<_a>' => 'staff/<_c>/<_a>',
+
+                'dashboard' => 'dashboard/default/index',
+                'dashboard/<_c>' => 'dashboard/<_c>/index',
+                'dashboard/<_c>/<_a>' => 'dashboard/<_c>/<_a>',
 
                 'document/<id>' => 'site/view',
                 '<_a:login|logout>' => 'site/<_a>',

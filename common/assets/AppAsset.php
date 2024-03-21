@@ -52,7 +52,8 @@ class AppAsset extends AssetBundle
         'plugins/select2/js/select2.full.min.js',
         'plugins/bs-custom-file-input/bs-custom-file-input.min.js',
         'plugins/dropzone/min/dropzone.min.js',
-        //        'dist/js/pages/dashboard.js',
+        'plugins/infinite-scroll/infinite-scroll.pkgd.min.js',
+//        '//unpkg.com/packery@2/dist/packery.pkgd.min.js',
         'js/app.js',
     ];
 

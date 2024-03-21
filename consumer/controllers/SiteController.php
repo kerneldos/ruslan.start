@@ -91,46 +91,9 @@ class SiteController extends BaseController
     }
 
     /**
-     * @return string|Response
-     * @throws Exception
+     * @return string
      */
-    public function actionIndex() {
-        if (Yii::$app->request->isAjax) {
-            $searchResult = Document::find()->addAggregate('documents_by_type', [
-                'terms' => [
-                    'field' => 'media_type',
-                ],
-            ])->limit(0)->search();
-
-            $documentsByType = [
-                'labels' => array_column($searchResult['aggregations']['documents_by_type']['buckets'], 'key'),
-                'data'   => array_column($searchResult['aggregations']['documents_by_type']['buckets'], 'doc_count'),
-            ];
-
-            $searchResult = Document::find()->addAggregate('documents_by_date', [
-                'date_histogram' => [
-                    'field' => 'created',
-                    'calendar_interval' => 'month',
-                    'min_doc_count' => 1,
-                ],
-            ])->limit(0)->search();
-
-            $documentsByDate = [
-                'labels' => array_map(
-                    function($date) {return date('d.m.Y', strtotime($date));},
-                    array_column($searchResult['aggregations']['documents_by_date']['buckets'], 'key_as_string'),
-                ),
-                'data'   => array_column($searchResult['aggregations']['documents_by_date']['buckets'], 'doc_count'),
-            ];
-
-            return $this->asJson([
-                'documentsByType' => $documentsByType,
-                'documentsByDate' => $documentsByDate,
-            ]);
-        }
-
-        $this->view->assetManager->getBundle('common\assets\AppAsset')->js[] = 'dist/js/pages/dashboard.js';
-
+    public function actionIndex(): string {
         return $this->render('index');
     }
 
@@ -151,6 +114,8 @@ class SiteController extends BaseController
 
         $tags = Tag::find()->all();
         $categories = Category::find()->where(['parent_id' => $searchModel->category ?? 0])->all();
+
+//        $this->view->assetManager->getBundle('common\assets\AppAsset')->js[] = 'dist/js/pages/search.js';
 
         return $this->render('search', [
             'searchModel' => $searchModel,
@@ -287,35 +252,35 @@ class SiteController extends BaseController
         Document::deleteIndex();
         Document::createIndex();
 
-        $es = Yii::$app->elasticsearch;
-
-        $es->delete('_ingest/pipeline/attachment');
-        $es->put('_ingest/pipeline/attachment', [], json_encode([
-            'description'  => 'Extract attachment information',
-            'processors' => [
-                [
-                    'attachment' => [
-                        'field' => 'content',
-                        'target_field' => 'attachment',
-                        'indexed_chars' => -1,
-                        'ignore_failure' => true
-                    ],
-                ],
-                [
-                    'set' => [
-                        'field' => 'content',
-                        'value' => '{{{attachment.content}}}',
-                        'ignore_failure' => true,
-                    ],
-                ],
+//        $es = Yii::$app->elasticsearch;
+//
+//        $es->delete('_ingest/pipeline/attachment');
+//        $es->put('_ingest/pipeline/attachment', [], json_encode([
+//            'description'  => 'Extract attachment information',
+//            'processors' => [
 //                [
-//                    'remove' => [
+//                    'attachment' => [
 //                        'field' => 'content',
+//                        'target_field' => 'attachment',
+//                        'indexed_chars' => -1,
 //                        'ignore_failure' => true
 //                    ],
 //                ],
-            ],
-        ]));
+//                [
+//                    'set' => [
+//                        'field' => 'content',
+//                        'value' => '{{{attachment.content}}}',
+//                        'ignore_failure' => true,
+//                    ],
+//                ],
+////                [
+////                    'remove' => [
+////                        'field' => 'content',
+////                        'ignore_failure' => true
+////                    ],
+////                ],
+//            ],
+//        ]));
 
         return $this->redirect('index');
     }

@@ -93,6 +93,7 @@ $this->title = 'Search Project';
                                 'pager' => [
                                     'options' => [
                                         'class' => 'pagination mt-2',
+//                                        'class' => 'pagination d-none', //d-none FOR INFINITE SCROLL
                                     ],
 
                                     // Customzing CSS class for pager link
@@ -104,6 +105,8 @@ $this->title = 'Search Project';
                                     'prevPageCssClass' => 'paginate_button page-item previous',
                                     'nextPageCssClass' => 'paginate_button page-item next',
                                     'disabledListItemSubTagOptions' => ['tag' => 'a', 'class' => 'page-link'],
+
+//                                    'maxButtonCount' => 0, //FOR INFINITE SCROLL
                                 ],
                             ]); ?>
                         </div>
