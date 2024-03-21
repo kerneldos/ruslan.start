@@ -133,12 +133,12 @@ class Document extends ActiveRecord
                 'category'    => ['type' => 'keyword'],
                 'ai_category' => ['type' => 'keyword'],
                 'tags'        => ['type' => 'keyword'],
-                'attachment'  => [
-                    'type' => 'object',
-                    'properties' => [
-                        'content' => ['type' => 'text', 'fielddata' => 'true'],
-                    ],
-                ],
+//                'attachment'  => [
+//                    'type' => 'object',
+//                    'properties' => [
+//                        'content' => ['type' => 'text', 'fielddata' => 'true'],
+//                    ],
+//                ],
             ]
         ];
     }
