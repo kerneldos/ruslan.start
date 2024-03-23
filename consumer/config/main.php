@@ -20,6 +20,15 @@ return [
             'class' => 'consumer\modules\dashboard\Module',
         ],
     ],
+    'as access' => [
+        'class' => 'yii\filters\AccessControl',
+        'rules' => [
+            [
+                'allow' => true,
+                'roles' => ['portal_member'],
+            ],
+        ],
+    ],
     'components' => [
         'request' => [
             'baseUrl' => '',

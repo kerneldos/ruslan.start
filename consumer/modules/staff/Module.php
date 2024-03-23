@@ -20,23 +20,6 @@ class Module extends \yii\base\Module
     /**
      * {@inheritdoc}
      */
-    public function behaviors(): array {
-        return [
-            'access' => [
-                'class' => 'yii\filters\AccessControl',
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'roles' => ['portal_member'],
-                    ],
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function init()
     {
         parent::init();
