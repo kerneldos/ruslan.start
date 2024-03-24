@@ -18,6 +18,7 @@ class DefaultController extends Controller
             'consumer\modules\dashboard\widgets\DocumentsByDate',
             'consumer\modules\dashboard\widgets\ToDoList',
             'consumer\modules\dashboard\widgets\DocumentsByType',
+            'consumer\modules\dashboard\widgets\DocumentsByCategory',
             'consumer\modules\dashboard\widgets\Calendar',
         ];
 
