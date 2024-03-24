@@ -22,7 +22,7 @@ class DocumentsByCategory extends Widget {
 
         $labels = [];
         foreach ($searchResult['aggregations']['documents_by_category']['buckets'] as $bucket) {
-            $labels[] = AiCategory::findOne($bucket['key'])->name;
+            $labels[] = AiCategory::findOne($bucket['key'])->name ?? 'Unknown';
         }
 
         $documentsByCategory = [
