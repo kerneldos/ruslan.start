@@ -17,7 +17,7 @@ class DocumentsByTypeAsset extends AssetBundle
     public $css = [];
 
     public $js = [
-        'js/documents-by-type.js',
+        'js/chart.js',
     ];
 
     public $depends = [

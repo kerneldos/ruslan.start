@@ -17,7 +17,7 @@ class DocumentsByCategoryAsset extends AssetBundle
     public $css = [];
 
     public $js = [
-        'js/documents-by-category.js',
+        'js/chart.js',
     ];
 
     public $depends = [

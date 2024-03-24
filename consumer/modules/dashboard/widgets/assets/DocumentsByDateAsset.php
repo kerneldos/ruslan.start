@@ -17,7 +17,7 @@ class DocumentsByDateAsset extends AssetBundle
     public $css = [];
 
     public $js = [
-        'js/documents-by-date.js',
+        'js/chart.js',
     ];
 
     public $depends = [
