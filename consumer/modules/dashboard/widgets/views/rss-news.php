@@ -15,9 +15,9 @@
                 <h5><a href="<?= $item['link'] ?>" target="_blank"><?= $item['title'] ?></a></h5>
 
                 <p>
-                    <img src="<?= $item['enclosure']['@attributes']['url'] ?>" alt="" style="height: 120px;float: <?= ($key % 2 == 0 ? 'left' : 'right') ?>;margin-<?= ($key % 2 == 0 ? 'right' : 'left') ?>: 10px;">
-
                     <?php if (is_string($item['description'])): ?>
+                        <img src="<?= $item['enclosure']['@attributes']['url'] ?>" alt="" style="height: 120px;float: <?= ($key % 2 == 0 ? 'left' : 'right') ?>;margin-<?= ($key % 2 == 0 ? 'right' : 'left') ?>: 10px;">
+
                         <?= $item['description'] ?>
                     <?php endif; ?>
                 </p>
