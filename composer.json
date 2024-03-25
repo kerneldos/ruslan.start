@@ -25,7 +25,9 @@
         "yiisoft/yii2-queue": "^2.3",
         "ext-json": "*",
         "ext-openssl": "*",
-        "ext-curl": "*"
+        "ext-curl": "*",
+        "ext-simplexml": "*",
+        "ext-libxml": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

@@ -16,10 +16,11 @@ class DefaultController extends Controller
     public function actionIndex(): string {
         $widgets = [
             'consumer\modules\dashboard\widgets\DocumentsByDate',
-            'consumer\modules\dashboard\widgets\ToDoList',
+            'consumer\modules\dashboard\widgets\RssNews',
             'consumer\modules\dashboard\widgets\DocumentsByType',
             'consumer\modules\dashboard\widgets\DocumentsByCategory',
             'consumer\modules\dashboard\widgets\Calendar',
+            'consumer\modules\dashboard\widgets\ToDoList',
         ];
 
         return $this->render('index', ['widgets' => $widgets]);

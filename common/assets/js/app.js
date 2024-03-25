@@ -143,4 +143,6 @@
         }
     }
     // DropzoneJS Demo Code End
+
+    $('.overlay-scrollbar').overlayScrollbars({});
 })(jQuery)

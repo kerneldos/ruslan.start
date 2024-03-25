@@ -6,39 +6,36 @@ use common\models\Portal;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\InvalidRouteException;
-use yii\console\Controller;
+use yii\console\controllers\MigrateController;
 use yii\console\Exception;
-use yii\console\Response;
 
-class ConsumerMigrateController extends Controller {
+class ConsumerMigrateController extends MigrateController {
+    public $migrationPath = ['@console/migrations/consumer'];
+
     /**
      * @return void
      * @throws InvalidConfigException
      * @throws InvalidRouteException
      * @throws Exception
      */
-    public function actionIndex() {
+    public function actionUp($limit = 0) {
         $portals = Portal::find()->all();
+
+        $this->interactive = false;
 
         /** @var Portal $portal */
         foreach ($portals as $portal) {
-            $consumerConfig = require dirname(__DIR__, 2) . '/consumer/config/client/' . $portal->temp_name . '.php';
+            $consumerConfig = dirname(__DIR__, 2) . '/consumer/clients/' . $portal->temp_name . '/config/main.php';
 
-            Yii::$app->set('db', $consumerConfig['components']['db']);
-            Yii::$app->params['sub_domain'] = $portal->temp_name;
+            if (file_exists($consumerConfig)) {
+                $config = require $consumerConfig;
 
-            Yii::$app->runAction('migrate/up', ['migrationPath' => '@console/migrations/consumer/', 'interactive' => false]);
+                $this->db->dsn = $config['components']['db']['dsn'];
+
+                Yii::$app->params['sub_domain'] = $portal->temp_name;
+
+                parent::actionUp($limit);
+            }
         }
-    }
-
-    /**
-     * @param $name
-     *
-     * @return int|mixed|Response|null
-     * @throws Exception
-     * @throws InvalidRouteException
-     */
-    public function actionCreate($name) {
-        return Yii::$app->runAction('migrate/create', ['migrationPath' => '@console/migrations/consumer', $name]);
     }
 }
