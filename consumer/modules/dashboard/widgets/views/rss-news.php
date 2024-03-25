@@ -16,7 +16,10 @@
 
                 <p>
                     <img src="<?= $item['enclosure']['@attributes']['url'] ?>" alt="" style="height: 120px;float: <?= ($key % 2 == 0 ? 'left' : 'right') ?>;margin-<?= ($key % 2 == 0 ? 'right' : 'left') ?>: 10px;">
-                    <?= $item['description'] ?>
+
+                    <?php if (is_string($item['description'])): ?>
+                        <?= $item['description'] ?>
+                    <?php endif; ?>
                 </p>
             </div>
         <?php endforeach; ?>
